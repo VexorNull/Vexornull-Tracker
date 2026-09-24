@@ -6,10 +6,10 @@
     <link rel="icon" type="image/png" href="https://vexornull.github.io/favicon/favicon.png">
     
     <!-- Advanced SEO Meta Tags -->
-    <title>Tanveer Tracker Pro v5.0 | Ultimate Office & Productivity Suite</title>
-    <meta name="title" content="Tanveer Tracker Pro v5.0 | Ultimate Office & Productivity Suite">
-    <meta name="description" content="An enterprise-grade daily attendance tracker, task manager, petty cash calculator, and secure productivity dashboard created by Tanveer Hussain (@vexornull).">
-    <meta name="keywords" content="attendance tracker, task manager, productivity suite, petty cash, excel export, json backup, vexornull, Tanveer Hussain">
+    <title>Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite</title>
+    <meta name="title" content="Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite">
+    <meta name="description" content="An enterprise-grade daily attendance tracker, task manager, petty cash calculator, invoice generator, and secure productivity dashboard created by Tanveer Hussain (@vexornull).">
+    <meta name="keywords" content="attendance tracker, task manager, invoice generator, productivity suite, petty cash, excel export, json backup, vexornull, Tanveer Hussain">
     <meta name="author" content="Tanveer Hussain (@vexornull)">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://Instagram.com/vexornull">
@@ -17,16 +17,16 @@
     <!-- Open Graph / Social Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://Instagram.com/vexornull">
-    <meta property="og:title" content="Tanveer Tracker Pro v5.0 | Ultimate Office & Productivity Suite">
-    <meta property="og:description" content="Manage office tasks, attendance, expenses, and notes with analytics and security lock. Created by Tanveer Hussain (@vexornull).">
-    <meta property="og:image" content="https://placehold.co/1200x630/030712/38bdf8?text=Tanveer+Tracker+Pro+v5.0+%7C+@vexornull">
+    <meta property="og:title" content="Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite">
+    <meta property="og:description" content="Manage office tasks, attendance, expenses, notes, and professional invoices with analytics and security lock. Created by Tanveer Hussain (@vexornull).">
+    <meta property="og:image" content="https://placehold.co/1200x630/030712/38bdf8?text=Tanveer+Tracker+Pro+v6.0+%7C+@vexornull">
 
     <!-- Twitter Card Meta Tags -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://Instagram.com/vexornull">
-    <meta property="twitter:title" content="Tanveer Tracker Pro v5.0 | Ultimate Office & Productivity Suite">
+    <meta property="twitter:title" content="Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite">
     <meta property="twitter:description" content="Enterprise productivity dashboard built by Tanveer Hussain (@vexornull).">
-    <meta property="twitter:image" content="https://placehold.co/1200x630/030712/38bdf8?text=Tanveer+Tracker+Pro+v5.0+%7C+@vexornull">
+    <meta property="twitter:image" content="https://placehold.co/1200x630/030712/38bdf8?text=Tanveer+Tracker+Pro+v6.0+%7C+@vexornull">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -62,6 +62,11 @@
         ::-webkit-scrollbar-track { background: inherit; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #0ea5e9; }
+        @media print {
+            body * { visibility: hidden; }
+            #printableInvoice, #printableInvoice * { visibility: visible; }
+            #printableInvoice { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white transition-colors duration-200" id="bodyRoot">
@@ -96,7 +101,7 @@
                 </div>
                 <div>
                     <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Tanveer Tracker Pro</span>
-                    <span class="hidden sm:inline-block text-xs text-slate-400 ml-2 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700">v5.0 Ultimate</span>
+                    <span class="hidden sm:inline-block text-xs text-slate-400 ml-2 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700">v6.0 Ultimate</span>
                 </div>
             </div>
             
@@ -122,7 +127,7 @@
         <section class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div>
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-3">
-                    <i class="fa-solid fa-circle-check"></i> Enterprise Workspace v5.0 Active
+                    <i class="fa-solid fa-circle-check"></i> Enterprise Workspace v6.0 Active
                 </div>
                 <h1 class="text-2xl sm:text-4xl font-extrabold text-white">Welcome back, <span class="text-cyan-400">Tanveer Hussain</span>! ⚡</h1>
                 <p class="text-slate-400 text-sm mt-1.5" id="currentDateDisplay">Loading calendar details...</p>
@@ -145,16 +150,19 @@
         <!-- Navigation Tabs -->
         <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800/80">
             <button onclick="switchTab('dashboard')" id="tabBtnDashboard" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-gauge-high"></i> Dashboard & Analytics
+                <i class="fa-solid fa-gauge-high"></i> Dashboard
             </button>
             <button onclick="switchTab('tasks')" id="tabBtnTasks" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
                 <i class="fa-solid fa-list-check"></i> Tasks & Attendance
             </button>
             <button onclick="switchTab('finance')" id="tabBtnFinance" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-wallet"></i> Petty Cash & Expenses
+                <i class="fa-solid fa-wallet"></i> Petty Cash
+            </button>
+            <button onclick="switchTab('invoice')" id="tabBtnInvoice" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Invoices
             </button>
             <button onclick="switchTab('notes')" id="tabBtnNotes" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-note-sticky"></i> Quick Notes & Vault
+                <i class="fa-solid fa-note-sticky"></i> Quick Notes
             </button>
         </div>
 
@@ -183,10 +191,10 @@
                     </div>
                 </div>
                 <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Active Notes</p>
+                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Generated Invoices</p>
                     <div class="flex items-baseline justify-between mt-2">
-                        <h3 id="statDashNotesCount" class="text-3xl font-extrabold text-purple-400">0</h3>
-                        <span class="text-xs text-purple-500/80">Secure Vault</span>
+                        <h3 id="statDashInvoiceCount" class="text-3xl font-extrabold text-purple-400">0</h3>
+                        <span class="text-xs text-purple-500/80">Total Billed</span>
                     </div>
                 </div>
             </div>
@@ -392,7 +400,122 @@
             </div>
         </div>
 
-        <!-- TAB 4: QUICK NOTES & VAULT -->
+        <!-- TAB 4: INVOICE GENERATOR -->
+        <div id="tabContentInvoice" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Invoice Form Inputs -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice-dollar text-cyan-400"></i> New Invoice Builder
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Invoice Number</label>
+                            <input type="text" id="invNumber" value="INV-2026-001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Client Name / Company</label>
+                            <input type="text" id="invClientName" placeholder="Client or Business Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Client Email / Phone</label>
+                            <input type="text" id="invClientContact" placeholder="client@email.com / 0300..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-semibold text-slate-200">Item Details</h3>
+                        <input type="text" id="invItemDesc" placeholder="Item / Service Description" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="invItemQty" placeholder="Qty" value="1" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <input type="number" id="invItemRate" placeholder="Rate (Rs.)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <button onclick="addInvoiceItem()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition"><i class="fa-solid fa-plus mr-1"></i> Add Item to Invoice</button>
+                    </div>
+
+                    <div id="invItemsList" class="space-y-2 max-h-36 overflow-y-auto"></div>
+
+                    <button onclick="saveAndPrintInvoice()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i> Save & Print / PDF Invoice
+                    </button>
+                </div>
+
+                <!-- Invoice Preview & History -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Printable Invoice Preview Card -->
+                    <div id="printableInvoice" class="bg-white text-slate-900 border border-slate-300 rounded-2xl p-8 shadow-2xl space-y-6">
+                        <div class="flex justify-between items-start border-b border-slate-200 pb-6">
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-900 tracking-tight">INVOICE</h2>
+                                <p id="previewInvNum" class="text-xs font-bold text-cyan-600 mt-1">INV-2026-001</p>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-sm font-bold text-slate-800">Tanveer Hussain</h3>
+                                <p class="text-xs text-slate-500">Freelance & Office Suite</p>
+                                <p class="text-xs text-cyan-600 font-semibold">@vexornull</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 text-xs">
+                            <div>
+                                <p class="font-bold text-slate-500 uppercase tracking-wider">Billed To:</p>
+                                <p id="previewClientName" class="font-bold text-slate-800 text-sm mt-1">Valued Client</p>
+                                <p id="previewClientContact" class="text-slate-600">client@example.com</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-slate-500 uppercase tracking-wider">Date:</p>
+                                <p id="previewDate" class="font-semibold text-slate-800 mt-1"></p>
+                            </div>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-100 text-slate-700 uppercase">
+                                    <tr>
+                                        <th class="p-3">Description</th>
+                                        <th class="p-3 text-center">Qty</th>
+                                        <th class="p-3 text-right">Rate</th>
+                                        <th class="p-3 text-right">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewTableBody" class="divide-y divide-slate-200">
+                                    <tr>
+                                        <td colspan="4" class="p-4 text-center text-slate-400">No items added yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <div class="w-64 space-y-2 text-xs">
+                                <div class="flex justify-between font-bold text-slate-800 text-sm border-t border-slate-200 pt-2">
+                                    <span>Total Due:</span>
+                                    <span id="previewTotalAmount" class="text-cyan-600">Rs. 0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-200 pt-4 text-center text-[11px] text-slate-500">
+                            Thank you for your business! Created by Tanveer Hussain (<a href="https://Instagram.com/vexornull" class="text-cyan-600">@vexornull</a>).
+                        </div>
+                    </div>
+
+                    <!-- Saved Invoices History -->
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-white">Invoice Records</h3>
+                            <button onclick="clearInvoices()" class="text-xs text-slate-400 hover:text-rose-400">Clear All</button>
+                        </div>
+                        <div id="invoiceHistoryList" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: QUICK NOTES & VAULT -->
         <div id="tabContentNotes" class="space-y-6 hidden">
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center">
@@ -418,7 +541,7 @@
             <div class="flex items-center space-x-3">
                 <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">TH</div>
                 <div>
-                    <p class="text-sm font-bold text-white">Tanveer Tracker Pro v5.0 Ultimate</p>
+                    <p class="text-sm font-bold text-white">Tanveer Tracker Pro v6.0 Ultimate</p>
                     <p class="text-xs text-slate-400">Crafted by <a href="https://Instagram.com/vexornull" target="_blank" class="text-cyan-400 hover:underline">Tanveer Hussain</a></p>
                 </div>
             </div>
@@ -497,23 +620,26 @@
         const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
         const todayDateStr = new Date().toLocaleDateString('en-US', options);
         document.getElementById('currentDateDisplay').textContent = todayDateStr;
+        document.getElementById('previewDate').textContent = todayDateStr;
 
-        // State variables v5
-        let tasks = JSON.parse(localStorage.getItem('vexornull_v5_tasks')) || [
+        // State variables v6
+        let tasks = JSON.parse(localStorage.getItem('vexornull_v6_tasks')) || [
             { id: 1, text: 'Review repository pull requests', dueDate: '2026-09-30', priority: 'High', completed: false },
             { id: 2, text: 'Sync sprint deliverables with team', dueDate: '2026-09-28', priority: 'Medium', completed: true }
         ];
-        let attendanceLogs = JSON.parse(localStorage.getItem('vexornull_v5_attendance')) || [
+        let attendanceLogs = JSON.parse(localStorage.getItem('vexornull_v6_attendance')) || [
             { date: todayDateStr, status: 'Present', shift: '09:00 AM - 06:00 PM', remarks: 'Sprint planning completed.' }
         ];
-        let quickNotes = JSON.parse(localStorage.getItem('vexornull_v5_notes')) || [
+        let quickNotes = JSON.parse(localStorage.getItem('vexornull_v6_notes')) || [
             { id: 1, title: 'Server SSH', category: 'Credentials', content: 'ssh root@192.168.1.50' }
         ];
-        let expenses = JSON.parse(localStorage.getItem('vexornull_v5_expenses')) || [
+        let expenses = JSON.parse(localStorage.getItem('vexornull_v6_expenses')) || [
             { id: 1, type: 'Expense', title: 'Office Stationary', amount: 1500 },
             { id: 2, type: 'Income', title: 'Client Advance', amount: 15000 }
         ];
-        let userPin = localStorage.getItem('vexornull_v5_pin') || '';
+        let invoices = JSON.parse(localStorage.getItem('vexornull_v6_invoices')) || [];
+        let currentInvoiceItems = [];
+        let userPin = localStorage.getItem('vexornull_v6_pin') || '';
         let currentTaskFilter = 'all';
 
         if (userPin) {
@@ -552,7 +678,7 @@
                 return;
             }
             userPin = val;
-            localStorage.setItem('vexornull_v5_pin', userPin);
+            localStorage.setItem('vexornull_v6_pin', userPin);
             closePinSettingsModal();
             showMsg('Success', userPin ? 'Security PIN updated successfully.' : 'PIN security disabled.', true);
         }
@@ -572,7 +698,7 @@
         }
 
         function switchTab(tabId) {
-            ['Dashboard', 'Tasks', 'Finance', 'Notes'].forEach(t => {
+            ['Dashboard', 'Tasks', 'Finance', 'Invoice', 'Notes'].forEach(t => {
                 document.getElementById(`tabContent${t}`).classList.add('hidden');
                 document.getElementById(`tabBtn${t}`).className = 'px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0';
             });
@@ -635,17 +761,18 @@
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(attendanceLogs), "Attendance");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(quickNotes), "Notes");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expenses), "Expenses");
-            XLSX.writeFile(wb, `Tanveer_Tracker_Pro_v5_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invoices), "Invoices");
+            XLSX.writeFile(wb, `Tanveer_Tracker_Pro_v6_${new Date().toISOString().slice(0,10)}.xlsx`);
             showMsg('Exported', 'Excel spreadsheet downloaded successfully.', true);
         }
 
         function exportJSONBackup() {
-            const backup = { tasks, attendanceLogs, quickNotes, expenses };
+            const backup = { tasks, attendanceLogs, quickNotes, expenses, invoices };
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Tanveer_Tracker_Backup_v5_${new Date().toISOString().slice(0,10)}.json`;
+            a.download = `Tanveer_Tracker_Backup_v6_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
             showMsg('Backup Created', 'JSON backup saved successfully.', true);
         }
@@ -661,11 +788,13 @@
                     if (data.attendanceLogs) attendanceLogs = data.attendanceLogs;
                     if (data.quickNotes) quickNotes = data.quickNotes;
                     if (data.expenses) expenses = data.expenses;
+                    if (data.invoices) invoices = data.invoices;
 
-                    localStorage.setItem('vexornull_v5_tasks', JSON.stringify(tasks));
-                    localStorage.setItem('vexornull_v5_attendance', JSON.stringify(attendanceLogs));
-                    localStorage.setItem('vexornull_v5_notes', JSON.stringify(quickNotes));
-                    localStorage.setItem('vexornull_v5_expenses', JSON.stringify(expenses));
+                    localStorage.setItem('vexornull_v6_tasks', JSON.stringify(tasks));
+                    localStorage.setItem('vexornull_v6_attendance', JSON.stringify(attendanceLogs));
+                    localStorage.setItem('vexornull_v6_notes', JSON.stringify(quickNotes));
+                    localStorage.setItem('vexornull_v6_expenses', JSON.stringify(expenses));
+                    localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices));
 
                     renderAll();
                     showMsg('Restored', 'Workspace data restored successfully.', true);
@@ -675,6 +804,129 @@
                 e.target.value = '';
             };
             reader.readAsText(file);
+        }
+
+        // --- INVOICE GENERATOR ---
+        document.getElementById('invClientName').addEventListener('input', function() {
+            document.getElementById('previewClientName').textContent = this.value || 'Valued Client';
+        });
+        document.getElementById('invClientContact').addEventListener('input', function() {
+            document.getElementById('previewClientContact').textContent = this.value || 'client@example.com';
+        });
+        document.getElementById('invNumber').addEventListener('input', function() {
+            document.getElementById('previewInvNum').textContent = this.value || 'INV-2026-001';
+        });
+
+        function addInvoiceItem() {
+            const desc = document.getElementById('invItemDesc').value.trim();
+            const qty = parseFloat(document.getElementById('invItemQty').value) || 1;
+            const rate = parseFloat(document.getElementById('invItemRate').value) || 0;
+            if (!desc || rate <= 0) {
+                showMsg('Missing Details', 'Please provide a valid item description and rate.', false);
+                return;
+            }
+            currentInvoiceItems.push({ id: Date.now(), desc, qty, rate, amount: qty * rate });
+            document.getElementById('invItemDesc').value = '';
+            document.getElementById('invItemQty').value = '1';
+            document.getElementById('invItemRate').value = '';
+            renderInvoiceBuilder();
+        }
+
+        function removeInvoiceItem(id) {
+            currentInvoiceItems = currentInvoiceItems.filter(i => i.id !== id);
+            renderInvoiceBuilder();
+        }
+
+        function renderInvoiceBuilder() {
+            const listContainer = document.getElementById('invItemsList');
+            const tableBody = document.getElementById('previewTableBody');
+            listContainer.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            if (currentInvoiceItems.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No items added yet.</td></tr>`;
+                document.getElementById('previewTotalAmount').textContent = 'Rs. 0';
+                return;
+            }
+
+            let total = 0;
+            currentInvoiceItems.forEach(item => {
+                total += item.amount;
+                // Sidebar item row
+                const d = document.createElement('div');
+                d.className = 'flex justify-between items-center p-2 bg-slate-950 border border-slate-800 rounded-xl text-xs';
+                d.innerHTML = `
+                    <span class="text-slate-200 truncate pr-2">${escapeHtml(item.desc)} (${item.qty} x ${item.rate})</span>
+                    <button onclick="removeInvoiceItem(${item.id})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                listContainer.appendChild(d);
+
+                // Printable table row
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-800 font-medium">${escapeHtml(item.desc)}</td>
+                    <td class="p-3 text-center text-slate-600">${item.qty}</td>
+                    <td class="p-3 text-right text-slate-600">Rs. ${item.rate.toLocaleString()}</td>
+                    <td class="p-3 text-right font-bold text-slate-800">Rs. ${item.amount.toLocaleString()}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            document.getElementById('previewTotalAmount').textContent = `Rs. ${total.toLocaleString()}`;
+        }
+
+        function saveAndPrintInvoice() {
+            if (currentInvoiceItems.length === 0) {
+                showMsg('No Items', 'Please add at least one item to generate an invoice.', false);
+                return;
+            }
+            const invNum = document.getElementById('invNumber').value;
+            const clientName = document.getElementById('invClientName').value || 'Valued Client';
+            const totalAmount = currentInvoiceItems.reduce((acc, curr) => acc + curr.amount, 0);
+
+            invoices.unshift({
+                id: Date.now(),
+                number: invNum,
+                client: clientName,
+                date: todayDateStr,
+                total: totalAmount,
+                items: [...currentInvoiceItems]
+            });
+            localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices));
+            renderInvoices();
+            updateAnalytics();
+            window.print();
+        }
+
+        function clearInvoices() {
+            invoices = [];
+            localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices));
+            renderInvoices();
+            updateAnalytics();
+        }
+
+        function renderInvoices() {
+            const container = document.getElementById('invoiceHistoryList');
+            container.innerHTML = '';
+            if (invoices.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-3">No saved invoices.</p>`;
+                return;
+            }
+            invoices.forEach(inv => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs';
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold text-slate-200">${escapeHtml(inv.number)} - ${escapeHtml(inv.client)}</p>
+                        <p class="text-[10px] text-slate-400">${inv.date}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-extrabold text-cyan-400">Rs. ${inv.total.toLocaleString()}</span>
+                        <button onclick="invoices = invoices.filter(x => x.id !== ${inv.id}); localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices)); renderInvoices(); updateAnalytics();" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
         // --- TASKS ---
@@ -690,7 +942,7 @@
             saveTasks();
         });
         function saveTasks() {
-            localStorage.setItem('vexornull_v5_tasks', JSON.stringify(tasks));
+            localStorage.setItem('vexornull_v6_tasks', JSON.stringify(tasks));
             renderTasks();
             updateAnalytics();
         }
@@ -753,14 +1005,14 @@
             if (idx >= 0) attendanceLogs[idx] = entry;
             else attendanceLogs.unshift(entry);
 
-            localStorage.setItem('vexornull_v5_attendance', JSON.stringify(attendanceLogs));
+            localStorage.setItem('vexornull_v6_attendance', JSON.stringify(attendanceLogs));
             renderAttendance();
             updateAnalytics();
             showMsg('Saved', 'Attendance logged successfully.', true);
         });
         function clearAttendanceHistory() {
             attendanceLogs = [];
-            localStorage.setItem('vexornull_v5_attendance', JSON.stringify(attendanceLogs));
+            localStorage.setItem('vexornull_v6_attendance', JSON.stringify(attendanceLogs));
             renderAttendance();
             updateAnalytics();
         }
@@ -800,7 +1052,7 @@
             saveExpenses();
         });
         function saveExpenses() {
-            localStorage.setItem('vexornull_v5_expenses', JSON.stringify(expenses));
+            localStorage.setItem('vexornull_v6_expenses', JSON.stringify(expenses));
             renderExpenses();
             updateAnalytics();
         }
@@ -842,7 +1094,7 @@
             const content = document.getElementById('noteContent').value.trim();
             if (!title || !content) return;
             quickNotes.unshift({ id: Date.now(), title, category, content });
-            localStorage.setItem('vexornull_v5_notes', JSON.stringify(quickNotes));
+            localStorage.setItem('vexornull_v6_notes', JSON.stringify(quickNotes));
             renderNotes();
             updateAnalytics();
             closeNewNoteModal();
@@ -864,7 +1116,7 @@
                                 <h4 class="text-xs font-bold text-slate-200 truncate">${escapeHtml(n.title)}</h4>
                                 <span class="text-[10px] text-cyan-400 font-medium">${n.category || 'General'}</span>
                             </div>
-                            <button onclick="quickNotes = quickNotes.filter(x => x.id !== ${n.id}); localStorage.setItem('vexornull_v5_notes', JSON.stringify(quickNotes)); renderNotes(); updateAnalytics();" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>
+                            <button onclick="quickNotes = quickNotes.filter(x => x.id !== ${n.id}); localStorage.setItem('vexornull_v6_notes', JSON.stringify(quickNotes)); renderNotes(); updateAnalytics();" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <p class="text-xs text-slate-400 whitespace-pre-wrap line-clamp-4 mt-2">${escapeHtml(n.content)}</p>
                     </div>
@@ -882,7 +1134,7 @@
 
             document.getElementById('statDashTotalTasks').textContent = totalTasks;
             document.getElementById('statDashPendingBadge').textContent = `${pendingTasks} pending`;
-            document.getElementById('statDashNotesCount').textContent = quickNotes.length;
+            document.getElementById('statDashInvoiceCount').textContent = invoices.length;
 
             document.getElementById('analyticsTaskPercent').textContent = `${taskRate}%`;
             document.getElementById('analyticsTaskBar').style.width = `${taskRate}%`;
@@ -918,6 +1170,7 @@
             renderTasks();
             renderAttendance();
             renderExpenses();
+            renderInvoices();
             renderNotes();
             updateAnalytics();
         }
