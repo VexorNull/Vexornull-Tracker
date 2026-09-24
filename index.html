@@ -5,56 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://vexornull.github.io/favicon/favicon.png">
     
-    <!-- Advanced SEO Meta Tags -->
-    <title>Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite</title>
-    <meta name="title" content="Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite">
-    <meta name="description" content="An enterprise-grade daily attendance tracker, task manager, petty cash calculator, invoice generator, and secure productivity dashboard created by Tanveer Hussain (@vexornull).">
-    <meta name="keywords" content="attendance tracker, task manager, invoice generator, productivity suite, petty cash, excel export, json backup, vexornull, Tanveer Hussain">
-    <meta name="author" content="Tanveer Hussain (@vexornull)">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://Instagram.com/vexornull">
-
-    <!-- Open Graph / Social Meta Tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://Instagram.com/vexornull">
-    <meta property="og:title" content="Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite">
-    <meta property="og:description" content="Manage office tasks, attendance, expenses, notes, and professional invoices with analytics and security lock. Created by Tanveer Hussain (@vexornull).">
-    <meta property="og:image" content="https://placehold.co/1200x630/030712/38bdf8?text=Tanveer+Tracker+Pro+v6.0+%7C+@vexornull">
-
-    <!-- Twitter Card Meta Tags -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://Instagram.com/vexornull">
-    <meta property="twitter:title" content="Tanveer Tracker Pro v6.0 | Ultimate Office & Invoice Suite">
-    <meta property="twitter:description" content="Enterprise productivity dashboard built by Tanveer Hussain (@vexornull).">
-    <meta property="twitter:image" content="https://placehold.co/1200x630/030712/38bdf8?text=Tanveer+Tracker+Pro+v6.0+%7C+@vexornull">
-
-    <!-- Tailwind CSS CDN -->
+    <title>Tanveer Tracker Pro v7.0 | ERP & Office Suite</title>
+    <meta name="description" content="Enterprise-grade ERP suite for task management, payroll, CRM, invoices, and analytics by Tanveer Hussain (@vexornull).">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            900: '#0369a1',
-                        }
-                    }
-                }
+                extend: { colors: { brand: { 500: '#0ea5e9' } } }
             }
         }
     </script>
 
-    <!-- FontAwesome & Google Fonts -->
+    <!-- FontAwesome, Google Fonts, SheetJS & Chart.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- SheetJS (xlsx) for Excel Export & Import -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -62,1120 +31,740 @@
         ::-webkit-scrollbar-track { background: inherit; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #0ea5e9; }
+        
+        /* Drag & Drop Kanban Styling */
+        .kanban-col { min-height: 200px; }
+        .drag-over { background: rgba(14, 165, 233, 0.1) !important; border-color: #0ea5e9 !important; border-style: dashed !important; }
+        
         @media print {
             body * { visibility: hidden; }
-            #printableInvoice, #printableInvoice * { visibility: visible; }
-            #printableInvoice { position: absolute; left: 0; top: 0; width: 100%; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area { position: absolute; left: 0; top: 0; width: 100%; }
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white transition-colors duration-200" id="bodyRoot">
 
-    <!-- Security PIN Lock Screen Overlay -->
-    <div id="pinLockScreen" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center space-y-6">
-            <div class="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mx-auto text-2xl shadow-inner shadow-cyan-500/20">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <div>
-                <h2 class="text-xl font-bold text-white">Secure Workspace</h2>
-                <p id="pinPromptText" class="text-xs text-slate-400 mt-1">Enter your 4-digit PIN to unlock Tanveer Tracker</p>
-            </div>
-            <div class="flex justify-center gap-3">
-                <input type="password" maxlength="1" class="pin-digit w-12 h-14 bg-slate-950 border border-slate-800 rounded-xl text-center text-xl font-bold text-white focus:border-cyan-500 focus:outline-none" oninput="handlePinInput(this, 0)">
-                <input type="password" maxlength="1" class="pin-digit w-12 h-14 bg-slate-950 border border-slate-800 rounded-xl text-center text-xl font-bold text-white focus:border-cyan-500 focus:outline-none" oninput="handlePinInput(this, 1)">
-                <input type="password" maxlength="1" class="pin-digit w-12 h-14 bg-slate-950 border border-slate-800 rounded-xl text-center text-xl font-bold text-white focus:border-cyan-500 focus:outline-none" oninput="handlePinInput(this, 2)">
-                <input type="password" maxlength="1" class="pin-digit w-12 h-14 bg-slate-950 border border-slate-800 rounded-xl text-center text-xl font-bold text-white focus:border-cyan-500 focus:outline-none" oninput="handlePinInput(this, 3)">
-            </div>
-            <button onclick="verifyPin()" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm shadow-lg shadow-cyan-500/20 transition">Unlock App</button>
-            <p class="text-[11px] text-slate-500">Created by Tanveer Hussain (<a href="https://Instagram.com/vexornull" target="_blank" class="text-cyan-400 hover:underline">@vexornull</a>)</p>
-        </div>
-    </div>
-
     <!-- Top Sticky Header -->
-    <header class="sticky top-0 z-45 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-slate-900/80 border-b border-slate-800 shadow-lg">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-xl">
-                    <i class="fa-solid fa-chart-line"></i>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 text-white font-bold text-xl">
+                    <i class="fa-brands fa-envira"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Tanveer Tracker Pro</span>
-                    <span class="hidden sm:inline-block text-xs text-slate-400 ml-2 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700">v6.0 Ultimate</span>
+                    <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Tanveer Tracker ERP</span>
+                    <span class="hidden sm:inline-block text-[10px] uppercase font-bold text-indigo-300 ml-2 px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">v7.0 Enterprise</span>
                 </div>
             </div>
             
             <div class="flex items-center space-x-3">
-                <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition" title="Toggle Theme">
-                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                <button onclick="exportToExcel()" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition text-xs font-semibold">
+                    <i class="fa-solid fa-file-excel"></i> Export All
                 </button>
-                <button onclick="openPinSettingsModal()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition" title="Security PIN Settings">
-                    <i class="fa-solid fa-lock"></i>
-                </button>
-                <div class="text-right hidden md:block pl-2 border-l border-slate-800">
-                    <p class="text-xs text-slate-400">Developer</p>
-                    <a href="https://Instagram.com/vexornull" target="_blank" class="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition">Tanveer Hussain (@vexornull)</a>
+                <div class="text-right hidden sm:block pl-3 border-l border-slate-800">
+                    <a href="https://Instagram.com/vexornull" target="_blank" class="text-sm font-bold text-cyan-400 hover:text-cyan-300">@vexornull</a>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Workspace Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col h-[calc(100vh-64px)] overflow-hidden gap-4">
         
-        <!-- Welcome Banner & Quick Actions -->
-        <section class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-3">
-                    <i class="fa-solid fa-circle-check"></i> Enterprise Workspace v6.0 Active
-                </div>
-                <h1 class="text-2xl sm:text-4xl font-extrabold text-white">Welcome back, <span class="text-cyan-400">Tanveer Hussain</span>! ⚡</h1>
-                <p class="text-slate-400 text-sm mt-1.5" id="currentDateDisplay">Loading calendar details...</p>
-            </div>
-            
-            <div class="flex flex-wrap items-center gap-2.5">
-                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center gap-2">
-                    <i class="fa-solid fa-file-excel"></i> Export Excel
-                </button>
-                <button onclick="exportJSONBackup()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center gap-2">
-                    <i class="fa-solid fa-download"></i> JSON Backup
-                </button>
-                <label class="bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-cyan-300 text-xs font-semibold px-4 py-3 rounded-xl border border-slate-700 cursor-pointer transition flex items-center gap-2">
-                    <i class="fa-solid fa-upload"></i> Restore
-                    <input type="file" id="jsonUploadInput" accept=".json, .xlsx" class="hidden" onchange="importBackup(event)">
-                </label>
-            </div>
-        </section>
-
         <!-- Navigation Tabs -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800/80">
-            <button onclick="switchTab('dashboard')" id="tabBtnDashboard" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-gauge-high"></i> Dashboard
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 shrink-0 hide-scroll">
+            <button onclick="switchTab('dashboard')" id="tabBtnDashboard" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm bg-cyan-600 text-white shadow-lg transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
             </button>
-            <button onclick="switchTab('tasks')" id="tabBtnTasks" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-list-check"></i> Tasks & Attendance
+            <button onclick="switchTab('kanban')" id="tabBtnKanban" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-table-columns"></i> Agile Board
             </button>
-            <button onclick="switchTab('finance')" id="tabBtnFinance" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
+            <button onclick="switchTab('crm')" id="tabBtnCrm" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-users"></i> CRM
+            </button>
+            <button onclick="switchTab('invoice')" id="tabBtnInvoice" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-file-invoice"></i> Invoices
+            </button>
+            <button onclick="switchTab('payroll')" id="tabBtnPayroll" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-money-check-dollar"></i> Payroll
+            </button>
+            <button onclick="switchTab('finance')" id="tabBtnFinance" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
                 <i class="fa-solid fa-wallet"></i> Petty Cash
             </button>
-            <button onclick="switchTab('invoice')" id="tabBtnInvoice" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-file-invoice-dollar"></i> Invoices
-            </button>
-            <button onclick="switchTab('notes')" id="tabBtnNotes" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-note-sticky"></i> Quick Notes
-            </button>
         </div>
 
-        <!-- TAB 1: DASHBOARD & ANALYTICS -->
-        <div id="tabContentDashboard" class="space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Tasks</p>
-                    <div class="flex items-baseline justify-between mt-2">
-                        <h3 id="statDashTotalTasks" class="text-3xl font-extrabold text-white">0</h3>
-                        <span id="statDashPendingBadge" class="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">0 pending</span>
+        <div class="flex-1 overflow-y-auto pr-2 custom-scroll">
+            <!-- TAB 1: DASHBOARD & ANALYTICS -->
+            <div id="tabContentDashboard" class="space-y-6">
+                <!-- Welcome & Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="md:col-span-4 bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900/20 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
+                        <div>
+                            <h1 class="text-2xl font-black text-white">Welcome, <span class="text-cyan-400">Tanveer Hussain</span> ⚡</h1>
+                            <p class="text-slate-400 text-sm mt-1" id="currentDateDisplay"></p>
+                        </div>
+                        <div class="hidden sm:block text-right">
+                            <p class="text-xs text-slate-400 font-bold uppercase">System Status</p>
+                            <p class="text-emerald-400 text-sm font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> All Modules Online</p>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Attendance Rate</p>
-                    <div class="flex items-baseline justify-between mt-2">
-                        <h3 id="statDashAttRate" class="text-3xl font-extrabold text-emerald-400">0%</h3>
-                        <span class="text-xs text-slate-400">This month</span>
-                    </div>
-                </div>
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Petty Cash Balance</p>
-                    <div class="flex items-baseline justify-between mt-2">
-                        <h3 id="statDashNetBalance" class="text-3xl font-extrabold text-cyan-400">Rs. 0</h3>
-                        <span class="text-xs text-cyan-500/80">Net Flow</span>
-                    </div>
-                </div>
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Generated Invoices</p>
-                    <div class="flex items-baseline justify-between mt-2">
-                        <h3 id="statDashInvoiceCount" class="text-3xl font-extrabold text-purple-400">0</h3>
-                        <span class="text-xs text-purple-500/80">Total Billed</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analytics & Pomodoro Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-cyan-400"></i> Productivity & Financial Breakdown
-                    </h2>
                     
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
-                                <span>Task Completion Progress</span>
-                                <span id="analyticsTaskPercent">0%</span>
-                            </div>
-                            <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
-                                <div id="analyticsTaskBar" class="bg-gradient-to-r from-cyan-500 to-blue-600 h-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
-                                <span>Attendance Regularity Score</span>
-                                <span id="analyticsAttPercent">0%</span>
-                            </div>
-                            <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
-                                <div id="analyticsAttBar" class="bg-gradient-to-r from-emerald-500 to-teal-600 h-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
+                    <!-- KPI Cards -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-slate-800/50 text-6xl"><i class="fa-solid fa-list-check"></i></div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider relative z-10">Pending Tasks</p>
+                        <h3 id="dashPendingTasks" class="text-3xl font-black text-amber-400 mt-2 relative z-10">0</h3>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-800">
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                            <p class="text-xs text-slate-400">Present Days</p>
-                            <p id="analyticsPresentCount" class="text-2xl font-bold text-emerald-400 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                            <p class="text-xs text-slate-400">Leaves / WFH</p>
-                            <p id="analyticsLeaveCount" class="text-2xl font-bold text-amber-400 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                            <p class="text-xs text-slate-400">Total Expenses Logged</p>
-                            <p id="analyticsExpenseTotal" class="text-2xl font-bold text-rose-400 mt-1">Rs. 0</p>
-                        </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-slate-800/50 text-6xl"><i class="fa-solid fa-users"></i></div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider relative z-10">Total Clients</p>
+                        <h3 id="dashTotalClients" class="text-3xl font-black text-indigo-400 mt-2 relative z-10">0</h3>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-slate-800/50 text-6xl"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider relative z-10">Revenue (Billed)</p>
+                        <h3 id="dashTotalRevenue" class="text-2xl font-black text-cyan-400 mt-2 relative z-10">Rs. 0</h3>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-slate-800/50 text-6xl"><i class="fa-solid fa-wallet"></i></div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider relative z-10">Petty Cash Net</p>
+                        <h3 id="dashNetCash" class="text-2xl font-black text-emerald-400 mt-2 relative z-10">Rs. 0</h3>
                     </div>
                 </div>
 
-                <!-- Pomodoro Focus Timer -->
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-                    <div>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-1">
-                            <i class="fa-solid fa-stopwatch text-cyan-400"></i> Focus Timer
-                        </h2>
-                        <p class="text-xs text-slate-400">Boost work efficiency with 25-min sprints.</p>
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h2 class="text-sm font-bold text-slate-300 mb-4">Task Completion Overview</h2>
+                        <div class="h-64 flex justify-center"><canvas id="taskChart"></canvas></div>
                     </div>
-
-                    <div class="text-center py-6">
-                        <div id="pomodoroDisplay" class="text-5xl font-extrabold tracking-wider text-white font-mono">25:00</div>
-                        <p id="pomodoroStatus" class="text-xs font-semibold text-cyan-400 mt-2 uppercase tracking-widest">Ready to Focus</p>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button onclick="startPomodoro()" id="pomoStartBtn" class="flex-1 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-xs transition shadow-lg shadow-cyan-500/20">Start</button>
-                        <button onclick="pausePomodoro()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">Pause</button>
-                        <button onclick="resetPomodoro()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">Reset</button>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h2 class="text-sm font-bold text-slate-300 mb-4">Income vs Expenses</h2>
+                        <div class="h-64 flex justify-center"><canvas id="financeChart"></canvas></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 2: TASKS & ATTENDANCE -->
-        <div id="tabContentTasks" class="space-y-6 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left: Attendance Logger -->
-                <div class="space-y-6">
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
-                            <i class="fa-solid fa-fingerprint text-cyan-400"></i> Daily Attendance Log
-                        </h2>
+            <!-- TAB 2: AGILE KANBAN BOARD -->
+            <div id="tabContentKanban" class="hidden h-full flex flex-col space-y-4">
+                <div class="flex justify-between items-center shrink-0">
+                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-table-columns text-cyan-500 mr-2"></i> Project Kanban</h2>
+                    <button onclick="openTaskModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg transition"><i class="fa-solid fa-plus mr-1"></i> New Task</button>
+                </div>
+                
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden pb-4">
+                    <!-- Column: To Do -->
+                    <div class="bg-slate-900/50 border border-slate-800 rounded-2xl flex flex-col overflow-hidden">
+                        <div class="p-4 border-b border-slate-800 bg-slate-900 flex justify-between items-center shrink-0">
+                            <h3 class="font-bold text-slate-200">To Do</h3>
+                            <span id="countTodo" class="bg-slate-800 text-xs px-2 py-1 rounded-lg text-slate-400">0</span>
+                        </div>
+                        <div id="col-todo" class="kanban-col flex-1 p-3 space-y-3 overflow-y-auto" ondrop="drop(event, 'todo')" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+                    </div>
+                    
+                    <!-- Column: In Progress -->
+                    <div class="bg-slate-900/50 border border-slate-800 rounded-2xl flex flex-col overflow-hidden">
+                        <div class="p-4 border-b border-slate-800 bg-slate-900 flex justify-between items-center shrink-0">
+                            <h3 class="font-bold text-amber-400">In Progress</h3>
+                            <span id="countProg" class="bg-slate-800 text-xs px-2 py-1 rounded-lg text-slate-400">0</span>
+                        </div>
+                        <div id="col-progress" class="kanban-col flex-1 p-3 space-y-3 overflow-y-auto" ondrop="drop(event, 'progress')" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+                    </div>
 
-                        <form id="attendanceForm" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Status</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="attStatus" value="Present" class="peer sr-only" checked>
-                                        <div class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center text-xs font-medium text-slate-300 peer-checked:bg-emerald-500/20 peer-checked:border-emerald-500 peer-checked:text-emerald-400 transition">Present</div>
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="attStatus" value="Half-day" class="peer sr-only">
-                                        <div class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center text-xs font-medium text-slate-300 peer-checked:bg-amber-500/20 peer-checked:border-amber-500 peer-checked:text-amber-400 transition">Half-day</div>
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="attStatus" value="Remote/WFH" class="peer sr-only">
-                                        <div class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center text-xs font-medium text-slate-300 peer-checked:bg-cyan-500/20 peer-checked:border-cyan-500 peer-checked:text-cyan-400 transition">WFH</div>
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="attStatus" value="Leave" class="peer sr-only">
-                                        <div class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center text-xs font-medium text-slate-300 peer-checked:bg-rose-500/20 peer-checked:border-rose-500 peer-checked:text-rose-400 transition">Leave</div>
-                                    </label>
+                    <!-- Column: Done -->
+                    <div class="bg-slate-900/50 border border-slate-800 rounded-2xl flex flex-col overflow-hidden">
+                        <div class="p-4 border-b border-slate-800 bg-slate-900 flex justify-between items-center shrink-0">
+                            <h3 class="font-bold text-emerald-400">Done</h3>
+                            <span id="countDone" class="bg-slate-800 text-xs px-2 py-1 rounded-lg text-slate-400">0</span>
+                        </div>
+                        <div id="col-done" class="kanban-col flex-1 p-3 space-y-3 overflow-y-auto" ondrop="drop(event, 'done')" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: CLIENT CRM -->
+            <div id="tabContentCrm" class="hidden space-y-6">
+                 <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-users text-indigo-400 mr-2"></i> Client Directory</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit shrink-0">
+                        <h3 class="font-bold text-slate-200 mb-4">Add New Client</h3>
+                        <form id="crmForm" class="space-y-3">
+                            <input type="text" id="crmName" placeholder="Client / Company Name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none">
+                            <input type="email" id="crmEmail" placeholder="Email Address" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none">
+                            <input type="text" id="crmPhone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-sm transition">Save Contact</button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="crmList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: SMART INVOICES -->
+            <div id="tabContentInvoice" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Invoice Builder -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit space-y-4">
+                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-file-invoice text-cyan-400 mr-2"></i> Create Invoice</h2>
+                        
+                        <div>
+                            <label class="text-xs text-slate-400 mb-1 block">Select Client</label>
+                            <select id="invClientSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:border-cyan-500 focus:outline-none" onchange="autoFillClient()">
+                                <option value="">-- Choose from CRM --</option>
+                            </select>
+                        </div>
+                        <input type="text" id="invNum" value="INV-1001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                        
+                        <hr class="border-slate-800">
+                        <div class="space-y-2">
+                            <input type="text" id="invItem" placeholder="Service / Item Description" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="invQty" placeholder="Qty" value="1" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                                <input type="number" id="invRate" placeholder="Rate (Rs)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                            </div>
+                            <button onclick="addInvItem()" class="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-bold py-2 rounded-xl transition">Add Item</button>
+                        </div>
+                        <div id="invPreviewList" class="space-y-2 max-h-32 overflow-y-auto"></div>
+                        <button onclick="printSmartInvoice()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl text-sm transition"><i class="fa-solid fa-print mr-2"></i> Print & Save Invoice</button>
+                    </div>
+
+                    <!-- Printable Canvas Area -->
+                    <div class="lg:col-span-2">
+                        <div id="smartInvoicePrint" class="print-area bg-white text-slate-900 rounded-2xl p-10 shadow-2xl relative overflow-hidden">
+                            <!-- Background Watermark -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] text-9xl pointer-events-none">
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </div>
+                            
+                            <div class="flex justify-between items-start border-b-2 border-slate-200 pb-6 mb-6 relative z-10">
+                                <div>
+                                    <h1 class="text-4xl font-black text-slate-800 tracking-tighter">INVOICE</h1>
+                                    <p id="dispInvNum" class="text-sm font-bold text-cyan-600 mt-1">INV-1001</p>
+                                </div>
+                                <div class="text-right">
+                                    <h2 class="text-lg font-black text-slate-800">Tanveer Hussain</h2>
+                                    <p class="text-xs text-slate-500 font-semibold">Web Developer & Office Assistant</p>
+                                    <p class="text-xs text-cyan-600 font-bold mt-1">@vexornull</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-8 mb-8 relative z-10">
+                                <div>
+                                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Billed To:</p>
+                                    <h3 id="dispClientName" class="text-lg font-bold text-slate-800">Client Name</h3>
+                                    <p id="dispClientEmail" class="text-sm text-slate-500">email@example.com</p>
+                                    <p id="dispClientPhone" class="text-sm text-slate-500">Phone</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Date:</p>
+                                    <p id="dispInvDate" class="text-sm font-bold text-slate-800"></p>
                                 </div>
                             </div>
 
-                            <div>
-                                <label for="shiftTiming" class="block text-xs font-medium text-slate-300 mb-1">Shift Hours</label>
-                                <input type="text" id="shiftTiming" placeholder="09:00 AM - 06:00 PM" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                            </div>
+                            <table class="w-full text-left relative z-10 mb-8">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider">
+                                        <th class="p-3 rounded-l-lg">Description</th>
+                                        <th class="p-3 text-center">Qty</th>
+                                        <th class="p-3 text-right">Rate</th>
+                                        <th class="p-3 text-right rounded-r-lg">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dispInvTable" class="divide-y divide-slate-100 text-sm">
+                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">Add items to generate invoice</td></tr>
+                                </tbody>
+                            </table>
 
-                            <div>
-                                <label for="attRemarks" class="block text-xs font-medium text-slate-300 mb-1">Daily Remarks</label>
-                                <textarea id="attRemarks" rows="2" placeholder="Tasks planned or accomplished today..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+                            <div class="flex justify-end relative z-10">
+                                <div class="w-1/2 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex justify-between items-center text-xl font-black text-slate-800">
+                                        <span>Total Due:</span>
+                                        <span id="dispInvTotal" class="text-cyan-600">Rs. 0</span>
+                                    </div>
+                                </div>
                             </div>
+                            
+                            <div class="mt-12 text-center text-xs text-slate-400 font-medium relative z-10">
+                                Thank you for your business. Generated securely via Tanveer Tracker ERP.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition">Save Attendance</button>
+            <!-- TAB 5: PAYROLL SYSTEM -->
+            <div id="tabContentPayroll" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit space-y-4">
+                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-money-check-dollar text-emerald-400 mr-2"></i> Payroll Calculator</h2>
+                        <form id="payrollForm" class="space-y-3">
+                            <input type="text" id="payEmpName" placeholder="Employee Name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                            <input type="text" id="payMonth" placeholder="Month & Year (e.g. Sept 2026)" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                            <hr class="border-slate-800">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[10px] text-slate-400">Basic Pay (Rs)</label>
+                                    <input type="number" id="payBasic" value="0" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-400">Allowances (Rs)</label>
+                                    <input type="number" id="payAllow" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[10px] text-slate-400">Overtime (Hours)</label>
+                                    <input type="number" id="payOtHours" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-400">OT Rate/Hr</label>
+                                    <input type="number" id="payOtRate" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-rose-400">Deductions/Advance (Rs)</label>
+                                <input type="number" id="payDeduct" value="0" class="w-full bg-rose-950/20 border border-rose-900/50 rounded-xl px-3 py-2 text-sm text-rose-100">
+                            </div>
+                            <button type="button" onclick="generatePayslip()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition"><i class="fa-solid fa-calculator mr-2"></i> Calculate & Print Slip</button>
                         </form>
                     </div>
 
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-base font-bold text-white">Attendance History</h3>
-                            <button onclick="clearAttendanceHistory()" class="text-xs text-slate-400 hover:text-rose-400">Clear</button>
-                        </div>
-                        <div id="attendanceHistoryList" class="space-y-3 max-h-56 overflow-y-auto pr-1"></div>
-                    </div>
-                </div>
-
-                <!-- Right: Task Manager -->
-                <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-cyan-400"></i> Daily Task Manager
-                            </h2>
-                            <p class="text-xs text-slate-400">Track deliverables, bugs, and office targets.</p>
-                        </div>
-                        <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-                            <button onclick="setTaskFilter('all')" id="filterBtnAll" class="px-3 py-1.5 rounded-lg font-medium bg-cyan-500 text-white">All</button>
-                            <button onclick="setTaskFilter('pending')" id="filterBtnPending" class="px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white">Pending</button>
-                            <button onclick="setTaskFilter('completed')" id="filterBtnCompleted" class="px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white">Completed</button>
-                        </div>
-                    </div>
-
-                    <form id="taskForm" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                        <input type="text" id="taskInput" placeholder="What needs to be done today?" required class="sm:col-span-6 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        <input type="date" id="taskDueDate" class="sm:col-span-3 bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm text-slate-300 focus:outline-none focus:border-cyan-500">
-                        <select id="taskPriority" class="sm:col-span-3 bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm text-slate-300 focus:outline-none focus:border-cyan-500">
-                            <option value="High">🔥 High</option>
-                            <option value="Medium" selected>⚡ Med</option>
-                            <option value="Low">🌱 Low</option>
-                        </select>
-                        <button type="submit" class="sm:col-span-12 bg-cyan-500 hover:bg-cyan-400 text-white font-semibold py-3 px-6 rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition">Add Task</button>
-                    </form>
-
-                    <div id="taskListContainer" class="space-y-3 max-h-[380px] overflow-y-auto pr-1"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: PETTY CASH & EXPENSES -->
-        <div id="tabContentFinance" class="space-y-6 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                    <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
-                        <i class="fa-solid fa-wallet text-cyan-400"></i> Add Expense / Cash
-                    </h2>
-                    <form id="expenseForm" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Transaction Type</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="expType" value="Expense" class="peer sr-only" checked>
-                                    <div class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center text-xs font-medium text-slate-300 peer-checked:bg-rose-500/20 peer-checked:border-rose-500 peer-checked:text-rose-400 transition">Expense (-)</div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="expType" value="Income" class="peer sr-only">
-                                    <div class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center text-xs font-medium text-slate-300 peer-checked:bg-emerald-500/20 peer-checked:border-emerald-500 peer-checked:text-emerald-400 transition">Income (+)</div>
-                                </label>
+                    <!-- Payslip Preview -->
+                    <div class="lg:col-span-2 flex justify-center">
+                        <div id="payslipPrint" class="print-area bg-white text-slate-900 rounded-lg shadow-2xl w-full max-w-md p-8 border-t-8 border-emerald-600 relative overflow-hidden">
+                             <div class="text-center mb-6 border-b border-slate-200 pb-4">
+                                <h2 class="text-2xl font-black text-slate-800">OFFICIAL PAYSLIP</h2>
+                                <p class="text-xs font-bold text-slate-500 tracking-widest uppercase">Tanveer Tracker ERP</p>
                             </div>
-                        </div>
-                        <div>
-                            <label for="expTitle" class="block text-xs font-medium text-slate-300 mb-1">Description</label>
-                            <input type="text" id="expTitle" placeholder="e.g. Fuel, Stationary, Lunch" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label for="expAmount" class="block text-xs font-medium text-slate-300 mb-1">Amount (Rs.)</label>
-                            <input type="number" step="1" id="expAmount" placeholder="0" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition">Record Transaction</button>
-                    </form>
-                </div>
-
-                <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-receipt text-cyan-400"></i> Petty Cash Ledger
-                        </h2>
-                        <button onclick="clearExpenses()" class="text-xs text-slate-400 hover:text-rose-400">Clear All</button>
-                    </div>
-                    <div id="expenseListContainer" class="space-y-3 max-h-[380px] overflow-y-auto pr-1"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 4: INVOICE GENERATOR -->
-        <div id="tabContentInvoice" class="space-y-6 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Invoice Form Inputs -->
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-file-invoice-dollar text-cyan-400"></i> New Invoice Builder
-                    </h2>
-                    
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Invoice Number</label>
-                            <input type="text" id="invNumber" value="INV-2026-001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Client Name / Company</label>
-                            <input type="text" id="invClientName" placeholder="Client or Business Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Client Email / Phone</label>
-                            <input type="text" id="invClientContact" placeholder="client@email.com / 0300..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        </div>
-                    </div>
-
-                    <hr class="border-slate-800">
-
-                    <div class="space-y-3">
-                        <h3 class="text-sm font-semibold text-slate-200">Item Details</h3>
-                        <input type="text" id="invItemDesc" placeholder="Item / Service Description" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="invItemQty" placeholder="Qty" value="1" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                            <input type="number" id="invItemRate" placeholder="Rate (Rs.)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <button onclick="addInvoiceItem()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition"><i class="fa-solid fa-plus mr-1"></i> Add Item to Invoice</button>
-                    </div>
-
-                    <div id="invItemsList" class="space-y-2 max-h-36 overflow-y-auto"></div>
-
-                    <button onclick="saveAndPrintInvoice()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-print"></i> Save & Print / PDF Invoice
-                    </button>
-                </div>
-
-                <!-- Invoice Preview & History -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Printable Invoice Preview Card -->
-                    <div id="printableInvoice" class="bg-white text-slate-900 border border-slate-300 rounded-2xl p-8 shadow-2xl space-y-6">
-                        <div class="flex justify-between items-start border-b border-slate-200 pb-6">
-                            <div>
-                                <h2 class="text-2xl font-black text-slate-900 tracking-tight">INVOICE</h2>
-                                <p id="previewInvNum" class="text-xs font-bold text-cyan-600 mt-1">INV-2026-001</p>
+                            
+                            <div class="flex justify-between text-sm font-bold text-slate-700 mb-6 bg-slate-50 p-3 rounded">
+                                <span>Employee: <span id="slipName" class="text-slate-900">N/A</span></span>
+                                <span>Month: <span id="slipMonth" class="text-slate-900">N/A</span></span>
                             </div>
-                            <div class="text-right">
-                                <h3 class="text-sm font-bold text-slate-800">Tanveer Hussain</h3>
-                                <p class="text-xs text-slate-500">Freelance & Office Suite</p>
-                                <p class="text-xs text-cyan-600 font-semibold">@vexornull</p>
-                            </div>
-                        </div>
 
-                        <div class="grid grid-cols-2 gap-4 text-xs">
-                            <div>
-                                <p class="font-bold text-slate-500 uppercase tracking-wider">Billed To:</p>
-                                <p id="previewClientName" class="font-bold text-slate-800 text-sm mt-1">Valued Client</p>
-                                <p id="previewClientContact" class="text-slate-600">client@example.com</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-bold text-slate-500 uppercase tracking-wider">Date:</p>
-                                <p id="previewDate" class="font-semibold text-slate-800 mt-1"></p>
-                            </div>
-                        </div>
-
-                        <div class="border border-slate-200 rounded-xl overflow-hidden">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-100 text-slate-700 uppercase">
-                                    <tr>
-                                        <th class="p-3">Description</th>
-                                        <th class="p-3 text-center">Qty</th>
-                                        <th class="p-3 text-right">Rate</th>
-                                        <th class="p-3 text-right">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="previewTableBody" class="divide-y divide-slate-200">
-                                    <tr>
-                                        <td colspan="4" class="p-4 text-center text-slate-400">No items added yet.</td>
-                                    </tr>
+                            <table class="w-full text-sm mb-6">
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr><td class="py-2 text-slate-600">Basic Salary</td><td class="py-2 text-right font-medium" id="slipBasic">Rs. 0</td></tr>
+                                    <tr><td class="py-2 text-slate-600">Allowances</td><td class="py-2 text-right font-medium" id="slipAllow">Rs. 0</td></tr>
+                                    <tr><td class="py-2 text-slate-600">Overtime (<span id="slipOtHrs">0</span> hrs)</td><td class="py-2 text-right font-medium text-emerald-600" id="slipOtTotal">+ Rs. 0</td></tr>
+                                    <tr><td class="py-2 text-slate-600 font-bold">Gross Pay</td><td class="py-2 text-right font-bold text-slate-800" id="slipGross">Rs. 0</td></tr>
+                                    <tr><td class="py-2 text-rose-500">Deductions</td><td class="py-2 text-right font-medium text-rose-500" id="slipDeduct">- Rs. 0</td></tr>
                                 </tbody>
                             </table>
-                        </div>
-
-                        <div class="flex justify-end pt-2">
-                            <div class="w-64 space-y-2 text-xs">
-                                <div class="flex justify-between font-bold text-slate-800 text-sm border-t border-slate-200 pt-2">
-                                    <span>Total Due:</span>
-                                    <span id="previewTotalAmount" class="text-cyan-600">Rs. 0</span>
-                                </div>
+                            
+                            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-lg flex justify-between items-center">
+                                <span class="font-black text-slate-700">NET SALARY</span>
+                                <span class="text-2xl font-black text-emerald-600" id="slipNet">Rs. 0</span>
+                            </div>
+                            
+                            <div class="mt-8 pt-4 border-t border-slate-200 flex justify-between items-end">
+                                <div class="text-center w-32 border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-500 uppercase">Employer Sig.</div>
+                                <div class="text-center w-32 border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-500 uppercase">Employee Sig.</div>
                             </div>
                         </div>
-
-                        <div class="border-t border-slate-200 pt-4 text-center text-[11px] text-slate-500">
-                            Thank you for your business! Created by Tanveer Hussain (<a href="https://Instagram.com/vexornull" class="text-cyan-600">@vexornull</a>).
-                        </div>
-                    </div>
-
-                    <!-- Saved Invoices History -->
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-base font-bold text-white">Invoice Records</h3>
-                            <button onclick="clearInvoices()" class="text-xs text-slate-400 hover:text-rose-400">Clear All</button>
-                        </div>
-                        <div id="invoiceHistoryList" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 5: QUICK NOTES & VAULT -->
-        <div id="tabContentNotes" class="space-y-6 hidden">
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-note-sticky text-cyan-400"></i> Quick Notes & Vault
-                        </h2>
-                        <p class="text-xs text-slate-400">Securely store credentials, snippets, and meeting pointers.</p>
-                    </div>
-                    <button onclick="openNewNoteModal()" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium px-4 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Add Note
-                    </button>
+            <!-- TAB 6: FINANCE (Existing Petty Cash Logic ported here for space) -->
+            <div id="tabContentFinance" class="hidden space-y-6">
+                <!-- Keep simple form for petty cash -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                    <h2 class="text-lg font-bold text-white mb-4">Petty Cash Ledger</h2>
+                    <form id="financeForm" class="flex flex-wrap gap-3 mb-6" onsubmit="addExpense(event)">
+                        <select id="finType" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-cyan-500"><option value="Expense">Expense (-)</option><option value="Income">Income (+)</option></select>
+                        <input type="text" id="finDesc" placeholder="Description" required class="flex-1 min-w-[200px] bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                        <input type="number" id="finAmount" placeholder="Amount" required class="w-32 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2 rounded-xl text-sm transition">Add</button>
+                    </form>
+                    <div id="finList" class="space-y-2 max-h-64 overflow-y-auto pr-2"></div>
                 </div>
-                <div id="notesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[450px] overflow-y-auto pr-1"></div>
             </div>
-        </div>
 
+        </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-auto border-t border-slate-800 bg-slate-900/60 backdrop-blur-md py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">TH</div>
-                <div>
-                    <p class="text-sm font-bold text-white">Tanveer Tracker Pro v6.0 Ultimate</p>
-                    <p class="text-xs text-slate-400">Crafted by <a href="https://Instagram.com/vexornull" target="_blank" class="text-cyan-400 hover:underline">Tanveer Hussain</a></p>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-3">
-                <a href="https://Instagram.com/vexornull" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-gradient-to-tr hover:from-amber-500 hover:to-purple-600 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition"><i class="fa-brands fa-instagram"></i></a>
-                <a href="https://github.com/vexornull" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition"><i class="fa-brands fa-github"></i></a>
-                <a href="https://youtube.com/@vexornull" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition"><i class="fa-brands fa-youtube"></i></a>
-                <a href="https://tiktok.com/@vexornull" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-900 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition"><i class="fa-brands fa-tiktok"></i></a>
-                <a href="https://linkedin.com/in/vexornull" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition"><i class="fa-brands fa-linkedin-in"></i></a>
-            </div>
-
-            <div class="text-xs text-slate-500 text-center md:text-right">&copy; <span id="currentYear"></span> Tanveer Hussain. All rights reserved.</div>
-        </div>
-    </footer>
-
-    <!-- Note Modal -->
-    <div id="noteModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white">New Quick Note</h3>
-                <button onclick="closeNewNoteModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form id="noteForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Title</label>
-                    <input type="text" id="noteTitle" placeholder="e.g. Server Credentials" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Category</label>
-                    <select id="noteCategory" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-cyan-500">
-                        <option value="General">📌 General</option>
-                        <option value="Credentials">🔐 Credentials</option>
-                        <option value="Snippets">💻 Code Snippet</option>
-                        <option value="Ideas">💡 Project Idea</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Content</label>
-                    <textarea id="noteContent" rows="4" placeholder="Write note content..." required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 resize-none"></textarea>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeNewNoteModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-500 text-white text-sm font-semibold">Save Note</button>
+    <!-- Modals -->
+    <!-- Task Modal -->
+    <div id="taskModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Add Task to Kanban</h3>
+            <form onsubmit="saveTask(event)" class="space-y-4">
+                <input type="text" id="taskText" placeholder="Task description..." required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                <select id="taskPriority" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                    <option value="High">🔥 High Priority</option>
+                    <option value="Medium" selected>⚡ Medium Priority</option>
+                    <option value="Low">🌱 Low Priority</option>
+                </select>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeTaskModal()" class="flex-1 bg-slate-800 text-slate-300 py-2.5 rounded-xl text-sm font-bold">Cancel</button>
+                    <button type="submit" class="flex-1 bg-cyan-600 text-white py-2.5 rounded-xl text-sm font-bold">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- PIN Settings Modal -->
-    <div id="pinSettingsModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-4">
-            <h3 class="text-base font-bold text-white">Security PIN Lock</h3>
-            <p class="text-xs text-slate-400">Set or remove your 4-digit security PIN.</p>
-            <input type="password" maxlength="4" id="newPinInput" placeholder="Enter 4-digit PIN (leave empty to disable)" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center text-lg text-white tracking-widest focus:outline-none focus:border-cyan-500">
-            <div class="flex gap-2 pt-2">
-                <button onclick="closePinSettingsModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Cancel</button>
-                <button onclick="savePinSettings()" class="flex-1 py-2.5 rounded-xl bg-cyan-500 text-white text-xs font-semibold">Save PIN</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Modal -->
-    <div id="customModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-4">
-            <div id="modalIcon" class="w-12 h-12 rounded-full bg-cyan-500/10 text-cyan-400 flex items-center justify-center mx-auto text-xl"><i class="fa-solid fa-info"></i></div>
-            <h3 id="modalTitle" class="text-base font-bold text-white">Notification</h3>
-            <p id="modalMessage" class="text-sm text-slate-400">Action completed successfully.</p>
-            <button onclick="closeCustomModal()" class="w-full py-2.5 rounded-xl bg-cyan-500 text-white text-sm font-semibold">Okay</button>
-        </div>
-    </div>
-
-    <!-- Application Script -->
+    <!-- Scripts -->
     <script>
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-        const todayDateStr = new Date().toLocaleDateString('en-US', options);
-        document.getElementById('currentDateDisplay').textContent = todayDateStr;
-        document.getElementById('previewDate').textContent = todayDateStr;
-
-        // State variables v6
-        let tasks = JSON.parse(localStorage.getItem('vexornull_v6_tasks')) || [
-            { id: 1, text: 'Review repository pull requests', dueDate: '2026-09-30', priority: 'High', completed: false },
-            { id: 2, text: 'Sync sprint deliverables with team', dueDate: '2026-09-28', priority: 'Medium', completed: true }
+        // Data Models
+        let tasks = JSON.parse(localStorage.getItem('tt_v7_tasks')) || [
+            { id: 1, text: 'Update Vercel deployment', status: 'todo', priority: 'High' },
+            { id: 2, text: 'Clear pending bills', status: 'progress', priority: 'Medium' }
         ];
-        let attendanceLogs = JSON.parse(localStorage.getItem('vexornull_v6_attendance')) || [
-            { date: todayDateStr, status: 'Present', shift: '09:00 AM - 06:00 PM', remarks: 'Sprint planning completed.' }
+        let crm = JSON.parse(localStorage.getItem('tt_v7_crm')) || [
+            { id: 1, name: 'Airmen Golf Club', email: 'admin@airmen.com', phone: '021-3456789' }
         ];
-        let quickNotes = JSON.parse(localStorage.getItem('vexornull_v6_notes')) || [
-            { id: 1, title: 'Server SSH', category: 'Credentials', content: 'ssh root@192.168.1.50' }
+        let finances = JSON.parse(localStorage.getItem('tt_v7_finances')) || [
+            { id: 1, desc: 'Starting Balance', amount: 5000, type: 'Income' }
         ];
-        let expenses = JSON.parse(localStorage.getItem('vexornull_v6_expenses')) || [
-            { id: 1, type: 'Expense', title: 'Office Stationary', amount: 1500 },
-            { id: 2, type: 'Income', title: 'Client Advance', amount: 15000 }
-        ];
-        let invoices = JSON.parse(localStorage.getItem('vexornull_v6_invoices')) || [];
-        let currentInvoiceItems = [];
-        let userPin = localStorage.getItem('vexornull_v6_pin') || '';
-        let currentTaskFilter = 'all';
+        let currentInvItems = [];
+        let charts = {};
 
-        if (userPin) {
-            document.getElementById('pinLockScreen').classList.remove('hidden');
-        }
-
-        function handlePinInput(el, idx) {
-            if (el.value.length === 1 && idx < 3) {
-                document.querySelectorAll('.pin-digit')[idx + 1].focus();
-            }
+        // Init
+        document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('dispInvDate').textContent = new Date().toLocaleDateString();
+        
+        function init() {
+            renderKanban();
+            renderCRM();
+            renderFinances();
+            updateDashboard();
         }
 
-        function verifyPin() {
-            const inputs = document.querySelectorAll('.pin-digit');
-            let entered = Array.from(inputs).map(i => i.value).join('');
-            if (entered === userPin) {
-                document.getElementById('pinLockScreen').classList.add('hidden');
-            } else {
-                showMsg('Access Denied', 'Incorrect security PIN.', false);
-                inputs.forEach(i => i.value = '');
-                inputs[0].focus();
-            }
-        }
-
-        function openPinSettingsModal() {
-            document.getElementById('pinSettingsModal').classList.remove('hidden');
-            document.getElementById('newPinInput').value = userPin;
-        }
-        function closePinSettingsModal() {
-            document.getElementById('pinSettingsModal').classList.add('hidden');
-        }
-        function savePinSettings() {
-            const val = document.getElementById('newPinInput').value.trim();
-            if (val && val.length !== 4) {
-                showMsg('Invalid PIN', 'PIN must be exactly 4 digits.', false);
-                return;
-            }
-            userPin = val;
-            localStorage.setItem('vexornull_v6_pin', userPin);
-            closePinSettingsModal();
-            showMsg('Success', userPin ? 'Security PIN updated successfully.' : 'PIN security disabled.', true);
-        }
-
-        let isDark = true;
-        function toggleTheme() {
-            isDark = !isDark;
-            const root = document.getElementById('bodyRoot');
-            const icon = document.getElementById('themeIcon');
-            if (isDark) {
-                root.className = 'bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white transition-colors duration-200';
-                icon.className = 'fa-solid fa-moon';
-            } else {
-                root.className = 'bg-slate-50 text-slate-900 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white transition-colors duration-200';
-                icon.className = 'fa-solid fa-sun';
-            }
-        }
-
-        function switchTab(tabId) {
-            ['Dashboard', 'Tasks', 'Finance', 'Invoice', 'Notes'].forEach(t => {
-                document.getElementById(`tabContent${t}`).classList.add('hidden');
-                document.getElementById(`tabBtn${t}`).className = 'px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition flex items-center gap-2 shrink-0';
+        // --- Tabs Logic ---
+        function switchTab(tab) {
+            document.querySelectorAll('main > div.flex-1 > div').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-cyan-600', 'text-white');
+                el.classList.add('bg-slate-900', 'text-slate-400');
             });
-            document.getElementById(`tabContent${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.remove('hidden');
-            document.getElementById(`tabBtn${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).className = 'px-5 py-2.5 rounded-xl font-semibold text-sm bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition flex items-center gap-2 shrink-0';
+            
+            document.getElementById(`tabContent${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+            let btn = document.getElementById(`tabBtn${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+            btn.classList.remove('bg-slate-900', 'text-slate-400');
+            btn.classList.add('bg-cyan-600', 'text-white');
+            
+            if(tab === 'dashboard') updateDashboard();
         }
 
-        // Pomodoro Timer
-        let pomoTime = 25 * 60;
-        let pomoInterval = null;
-        let pomoActive = false;
-
-        function updatePomodoroDisplay() {
-            const m = Math.floor(pomoTime / 60).toString().padStart(2, '0');
-            const s = (pomoTime % 60).toString().padStart(2, '0');
-            document.getElementById('pomodoroDisplay').textContent = `${m}:${s}`;
-        }
-        function startPomodoro() {
-            if (pomoActive) return;
-            pomoActive = true;
-            document.getElementById('pomodoroStatus').textContent = 'Focus Session Active';
-            pomoInterval = setInterval(() => {
-                if (pomoTime > 0) {
-                    pomoTime--;
-                    updatePomodoroDisplay();
-                } else {
-                    clearInterval(pomoInterval);
-                    pomoActive = false;
-                    document.getElementById('pomodoroStatus').textContent = 'Session Complete! Take a break.';
-                    alert('Pomodoro session completed!');
-                }
-            }, 1000);
-        }
-        function pausePomodoro() {
-            clearInterval(pomoInterval);
-            pomoActive = false;
-            document.getElementById('pomodoroStatus').textContent = 'Paused';
-        }
-        function resetPomodoro() {
-            clearInterval(pomoInterval);
-            pomoActive = false;
-            pomoTime = 25 * 60;
-            updatePomodoroDisplay();
-            document.getElementById('pomodoroStatus').textContent = 'Ready to Focus';
-        }
-
-        function showMsg(title, msg, isSuccess = true) {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = msg;
-            const icon = document.getElementById('modalIcon');
-            icon.className = isSuccess ? 'w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-xl' : 'w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto text-xl';
-            icon.innerHTML = isSuccess ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-triangle-exclamation"></i>';
-            document.getElementById('customModal').classList.remove('hidden');
-        }
-        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
-
-        function exportToExcel() {
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(tasks), "Tasks");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(attendanceLogs), "Attendance");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(quickNotes), "Notes");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expenses), "Expenses");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invoices), "Invoices");
-            XLSX.writeFile(wb, `Tanveer_Tracker_Pro_v6_${new Date().toISOString().slice(0,10)}.xlsx`);
-            showMsg('Exported', 'Excel spreadsheet downloaded successfully.', true);
-        }
-
-        function exportJSONBackup() {
-            const backup = { tasks, attendanceLogs, quickNotes, expenses, invoices };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Tanveer_Tracker_Backup_v6_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            showMsg('Backup Created', 'JSON backup saved successfully.', true);
-        }
-
-        function importBackup(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    const data = JSON.parse(evt.target.result);
-                    if (data.tasks) tasks = data.tasks;
-                    if (data.attendanceLogs) attendanceLogs = data.attendanceLogs;
-                    if (data.quickNotes) quickNotes = data.quickNotes;
-                    if (data.expenses) expenses = data.expenses;
-                    if (data.invoices) invoices = data.invoices;
-
-                    localStorage.setItem('vexornull_v6_tasks', JSON.stringify(tasks));
-                    localStorage.setItem('vexornull_v6_attendance', JSON.stringify(attendanceLogs));
-                    localStorage.setItem('vexornull_v6_notes', JSON.stringify(quickNotes));
-                    localStorage.setItem('vexornull_v6_expenses', JSON.stringify(expenses));
-                    localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices));
-
-                    renderAll();
-                    showMsg('Restored', 'Workspace data restored successfully.', true);
-                } catch (err) {
-                    showMsg('Error', 'Invalid backup file format.', false);
-                }
-                e.target.value = '';
-            };
-            reader.readAsText(file);
-        }
-
-        // --- INVOICE GENERATOR ---
-        document.getElementById('invClientName').addEventListener('input', function() {
-            document.getElementById('previewClientName').textContent = this.value || 'Valued Client';
-        });
-        document.getElementById('invClientContact').addEventListener('input', function() {
-            document.getElementById('previewClientContact').textContent = this.value || 'client@example.com';
-        });
-        document.getElementById('invNumber').addEventListener('input', function() {
-            document.getElementById('previewInvNum').textContent = this.value || 'INV-2026-001';
-        });
-
-        function addInvoiceItem() {
-            const desc = document.getElementById('invItemDesc').value.trim();
-            const qty = parseFloat(document.getElementById('invItemQty').value) || 1;
-            const rate = parseFloat(document.getElementById('invItemRate').value) || 0;
-            if (!desc || rate <= 0) {
-                showMsg('Missing Details', 'Please provide a valid item description and rate.', false);
-                return;
-            }
-            currentInvoiceItems.push({ id: Date.now(), desc, qty, rate, amount: qty * rate });
-            document.getElementById('invItemDesc').value = '';
-            document.getElementById('invItemQty').value = '1';
-            document.getElementById('invItemRate').value = '';
-            renderInvoiceBuilder();
-        }
-
-        function removeInvoiceItem(id) {
-            currentInvoiceItems = currentInvoiceItems.filter(i => i.id !== id);
-            renderInvoiceBuilder();
-        }
-
-        function renderInvoiceBuilder() {
-            const listContainer = document.getElementById('invItemsList');
-            const tableBody = document.getElementById('previewTableBody');
-            listContainer.innerHTML = '';
-            tableBody.innerHTML = '';
-
-            if (currentInvoiceItems.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No items added yet.</td></tr>`;
-                document.getElementById('previewTotalAmount').textContent = 'Rs. 0';
-                return;
-            }
-
-            let total = 0;
-            currentInvoiceItems.forEach(item => {
-                total += item.amount;
-                // Sidebar item row
-                const d = document.createElement('div');
-                d.className = 'flex justify-between items-center p-2 bg-slate-950 border border-slate-800 rounded-xl text-xs';
-                d.innerHTML = `
-                    <span class="text-slate-200 truncate pr-2">${escapeHtml(item.desc)} (${item.qty} x ${item.rate})</span>
-                    <button onclick="removeInvoiceItem(${item.id})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>
-                `;
-                listContainer.appendChild(d);
-
-                // Printable table row
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-3 text-slate-800 font-medium">${escapeHtml(item.desc)}</td>
-                    <td class="p-3 text-center text-slate-600">${item.qty}</td>
-                    <td class="p-3 text-right text-slate-600">Rs. ${item.rate.toLocaleString()}</td>
-                    <td class="p-3 text-right font-bold text-slate-800">Rs. ${item.amount.toLocaleString()}</td>
-                `;
-                tableBody.appendChild(tr);
-            });
-
-            document.getElementById('previewTotalAmount').textContent = `Rs. ${total.toLocaleString()}`;
-        }
-
-        function saveAndPrintInvoice() {
-            if (currentInvoiceItems.length === 0) {
-                showMsg('No Items', 'Please add at least one item to generate an invoice.', false);
-                return;
-            }
-            const invNum = document.getElementById('invNumber').value;
-            const clientName = document.getElementById('invClientName').value || 'Valued Client';
-            const totalAmount = currentInvoiceItems.reduce((acc, curr) => acc + curr.amount, 0);
-
-            invoices.unshift({
+        // --- Kanban Board Logic (Drag & Drop) ---
+        function openTaskModal() { document.getElementById('taskModal').classList.remove('hidden'); }
+        function closeTaskModal() { document.getElementById('taskModal').classList.add('hidden'); document.getElementById('taskText').value = ''; }
+        
+        function saveTask(e) {
+            e.preventDefault();
+            tasks.push({
                 id: Date.now(),
-                number: invNum,
-                client: clientName,
-                date: todayDateStr,
-                total: totalAmount,
-                items: [...currentInvoiceItems]
+                text: document.getElementById('taskText').value,
+                priority: document.getElementById('taskPriority').value,
+                status: 'todo'
             });
-            localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices));
-            renderInvoices();
-            updateAnalytics();
+            localStorage.setItem('tt_v7_tasks', JSON.stringify(tasks));
+            closeTaskModal();
+            renderKanban();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            localStorage.setItem('tt_v7_tasks', JSON.stringify(tasks));
+            renderKanban();
+        }
+
+        function renderKanban() {
+            ['todo', 'progress', 'done'].forEach(status => {
+                const col = document.getElementById(`col-${status}`);
+                col.innerHTML = '';
+                let count = 0;
+                
+                tasks.filter(t => t.status === status).forEach(t => {
+                    count++;
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-950 border border-slate-800 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm hover:border-cyan-500/50 transition relative group';
+                    card.draggable = true;
+                    card.ondragstart = (e) => { e.dataTransfer.setData('text/plain', t.id); card.classList.add('opacity-50'); };
+                    card.ondragend = () => card.classList.remove('opacity-50');
+                    
+                    let pColor = t.priority === 'High' ? 'text-rose-400 bg-rose-400/10' : (t.priority === 'Medium' ? 'text-amber-400 bg-amber-400/10' : 'text-emerald-400 bg-emerald-400/10');
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${pColor}">${t.priority}</span>
+                            <button onclick="deleteTask(${t.id})" class="text-slate-600 hover:text-rose-400 hidden group-hover:block"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        </div>
+                        <p class="text-sm text-slate-200 font-medium">${escapeHtml(t.text)}</p>
+                    `;
+                    col.appendChild(card);
+                });
+                
+                document.getElementById(`count${status.charAt(0).toUpperCase() + status.slice(1)}`).textContent = count;
+            });
+        }
+
+        // Drag events
+        function allowDrop(e) { e.preventDefault(); }
+        function dragEnter(e) { e.currentTarget.classList.add('drag-over'); }
+        function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function drop(e, status) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const id = parseInt(e.dataTransfer.getData('text/plain'));
+            const task = tasks.find(t => t.id === id);
+            if(task) {
+                task.status = status;
+                localStorage.setItem('tt_v7_tasks', JSON.stringify(tasks));
+                renderKanban();
+            }
+        }
+
+        // --- CRM Logic ---
+        document.getElementById('crmForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            crm.push({
+                id: Date.now(),
+                name: document.getElementById('crmName').value,
+                email: document.getElementById('crmEmail').value,
+                phone: document.getElementById('crmPhone').value
+            });
+            localStorage.setItem('tt_v7_crm', JSON.stringify(crm));
+            e.target.reset();
+            renderCRM();
+        });
+
+        function deleteCrm(id) {
+            crm = crm.filter(c => c.id !== id);
+            localStorage.setItem('tt_v7_crm', JSON.stringify(crm));
+            renderCRM();
+        }
+
+        function renderCRM() {
+            const list = document.getElementById('crmList');
+            const select = document.getElementById('invClientSelect');
+            list.innerHTML = '';
+            select.innerHTML = '<option value="">-- Choose from CRM --</option>';
+            
+            crm.forEach(c => {
+                // Render List
+                list.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center group hover:border-indigo-500/50 transition">
+                        <div>
+                            <h4 class="font-bold text-slate-200">${escapeHtml(c.name)}</h4>
+                            <p class="text-xs text-slate-400"><i class="fa-solid fa-envelope mr-1"></i>${escapeHtml(c.email || 'N/A')}</p>
+                            <p class="text-xs text-slate-400"><i class="fa-solid fa-phone mr-1"></i>${escapeHtml(c.phone || 'N/A')}</p>
+                        </div>
+                        <button onclick="deleteCrm(${c.id})" class="text-slate-600 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `;
+                // Fill Select
+                select.innerHTML += `<option value="${c.id}">${escapeHtml(c.name)}</option>`;
+            });
+        }
+
+        // --- Invoice Logic ---
+        function autoFillClient() {
+            const id = parseInt(document.getElementById('invClientSelect').value);
+            const c = crm.find(x => x.id === id);
+            if(c) {
+                document.getElementById('dispClientName').textContent = c.name;
+                document.getElementById('dispClientEmail').textContent = c.email || '';
+                document.getElementById('dispClientPhone').textContent = c.phone || '';
+            }
+        }
+        
+        document.getElementById('invNum').addEventListener('input', function() {
+            document.getElementById('dispInvNum').textContent = this.value || 'INV-1001';
+        });
+
+        function addInvItem() {
+            let desc = document.getElementById('invItem').value;
+            let qty = document.getElementById('invQty').value || 1;
+            let rate = document.getElementById('invRate').value;
+            if(!desc || !rate) return;
+            
+            currentInvItems.push({ id: Date.now(), desc, qty, rate, amt: qty*rate });
+            document.getElementById('invItem').value = '';
+            renderInvoiceItems();
+        }
+
+        function delInvItem(id) {
+            currentInvItems = currentInvItems.filter(i => i.id !== id);
+            renderInvoiceItems();
+        }
+
+        function renderInvoiceItems() {
+            const list = document.getElementById('invPreviewList');
+            const table = document.getElementById('dispInvTable');
+            list.innerHTML = ''; table.innerHTML = '';
+            let total = 0;
+
+            if(currentInvItems.length === 0) {
+                table.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Add items to generate invoice</td></tr>`;
+                document.getElementById('dispInvTotal').textContent = 'Rs. 0';
+                return;
+            }
+
+            currentInvItems.forEach(i => {
+                total += i.amt;
+                list.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-2 rounded text-xs border border-slate-800">
+                    <span class="text-slate-300 truncate">${escapeHtml(i.desc)}</span>
+                    <div class="flex items-center gap-2 text-cyan-400 font-bold">
+                        <span>Rs. ${i.amt}</span>
+                        <button onclick="delInvItem(${i.id})" class="text-slate-600 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>`;
+                
+                table.innerHTML += `<tr>
+                    <td class="p-3 font-medium text-slate-800 border-b border-slate-100">${escapeHtml(i.desc)}</td>
+                    <td class="p-3 text-center text-slate-600 border-b border-slate-100">${i.qty}</td>
+                    <td class="p-3 text-right text-slate-600 border-b border-slate-100">Rs. ${i.rate}</td>
+                    <td class="p-3 text-right font-bold text-slate-800 border-b border-slate-100">Rs. ${i.amt}</td>
+                </tr>`;
+            });
+            document.getElementById('dispInvTotal').textContent = `Rs. ${total.toLocaleString()}`;
+        }
+
+        function printSmartInvoice() {
+            switchTab('invoice');
             window.print();
         }
 
-        function clearInvoices() {
-            invoices = [];
-            localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices));
-            renderInvoices();
-            updateAnalytics();
+        // --- Payroll Logic ---
+        function generatePayslip() {
+            const name = document.getElementById('payEmpName').value || 'Employee';
+            const month = document.getElementById('payMonth').value || 'Current Month';
+            const basic = parseFloat(document.getElementById('payBasic').value) || 0;
+            const allow = parseFloat(document.getElementById('payAllow').value) || 0;
+            const otHrs = parseFloat(document.getElementById('payOtHours').value) || 0;
+            const otRate = parseFloat(document.getElementById('payOtRate').value) || 0;
+            const deduct = parseFloat(document.getElementById('payDeduct').value) || 0;
+
+            const otTotal = otHrs * otRate;
+            const gross = basic + allow + otTotal;
+            const net = gross - deduct;
+
+            document.getElementById('slipName').textContent = name;
+            document.getElementById('slipMonth').textContent = month;
+            document.getElementById('slipBasic').textContent = `Rs. ${basic.toLocaleString()}`;
+            document.getElementById('slipAllow').textContent = `Rs. ${allow.toLocaleString()}`;
+            document.getElementById('slipOtHrs').textContent = otHrs;
+            document.getElementById('slipOtTotal').textContent = `+ Rs. ${otTotal.toLocaleString()}`;
+            document.getElementById('slipGross').textContent = `Rs. ${gross.toLocaleString()}`;
+            document.getElementById('slipDeduct').textContent = `- Rs. ${deduct.toLocaleString()}`;
+            document.getElementById('slipNet').textContent = `Rs. ${net.toLocaleString()}`;
+
+            switchTab('payroll');
+            setTimeout(() => window.print(), 300);
         }
 
-        function renderInvoices() {
-            const container = document.getElementById('invoiceHistoryList');
-            container.innerHTML = '';
-            if (invoices.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-3">No saved invoices.</p>`;
-                return;
-            }
-            invoices.forEach(inv => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs';
-                div.innerHTML = `
-                    <div>
-                        <p class="font-bold text-slate-200">${escapeHtml(inv.number)} - ${escapeHtml(inv.client)}</p>
-                        <p class="text-[10px] text-slate-400">${inv.date}</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-extrabold text-cyan-400">Rs. ${inv.total.toLocaleString()}</span>
-                        <button onclick="invoices = invoices.filter(x => x.id !== ${inv.id}); localStorage.setItem('vexornull_v6_invoices', JSON.stringify(invoices)); renderInvoices(); updateAnalytics();" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // --- TASKS ---
-        document.getElementById('taskForm').addEventListener('submit', function(e) {
+        // --- Finances ---
+        function addExpense(e) {
             e.preventDefault();
-            const text = document.getElementById('taskInput').value.trim();
-            const dueDate = document.getElementById('taskDueDate').value;
-            const priority = document.getElementById('taskPriority').value;
-            if (!text) return;
-            tasks.unshift({ id: Date.now(), text, dueDate, priority, completed: false });
-            document.getElementById('taskInput').value = '';
-            document.getElementById('taskDueDate').value = '';
-            saveTasks();
-        });
-        function saveTasks() {
-            localStorage.setItem('vexornull_v6_tasks', JSON.stringify(tasks));
-            renderTasks();
-            updateAnalytics();
-        }
-        function toggleTask(id) {
-            tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-            saveTasks();
-        }
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveTasks();
-        }
-        function setTaskFilter(filter) {
-            currentTaskFilter = filter;
-            ['All', 'Pending', 'Completed'].forEach(f => {
-                const btn = document.getElementById(`filterBtn${f}`);
-                btn.className = f.toLowerCase() === filter ? 'px-3 py-1.5 rounded-lg font-medium bg-cyan-500 text-white' : 'px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white';
+            finances.push({
+                id: Date.now(),
+                type: document.getElementById('finType').value,
+                desc: document.getElementById('finDesc').value,
+                amount: parseFloat(document.getElementById('finAmount').value)
             });
-            renderTasks();
+            localStorage.setItem('tt_v7_finances', JSON.stringify(finances));
+            e.target.reset();
+            renderFinances();
         }
-        function renderTasks() {
-            const container = document.getElementById('taskListContainer');
-            container.innerHTML = '';
-            let filtered = tasks;
-            if (currentTaskFilter === 'pending') filtered = tasks.filter(t => !t.completed);
-            if (currentTaskFilter === 'completed') filtered = tasks.filter(t => t.completed);
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No tasks found.</p>`;
-                return;
-            }
-            filtered.forEach(t => {
-                const div = document.createElement('div');
-                div.className = `flex items-center justify-between p-3.5 rounded-xl border ${t.completed ? 'bg-slate-950/30 border-slate-900 opacity-75' : 'bg-slate-950 border-slate-800'}`;
-                div.innerHTML = `
-                    <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-                        <button onclick="toggleTask(${t.id})" class="w-6 h-6 rounded-lg border ${t.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-700 bg-slate-900 text-transparent'} flex items-center justify-center shrink-0"><i class="fa-solid fa-check text-xs"></i></button>
-                        <div class="min-w-0 flex-1">
-                            <p class="text-sm font-medium text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${escapeHtml(t.text)}</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded border ${t.priority === 'High' ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20'}">${t.priority}</span>
-                                ${t.dueDate ? `<span class="text-[10px] text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>${t.dueDate}</span>` : ''}
-                            </div>
+        function deleteFin(id) {
+            finances = finances.filter(f => f.id !== id);
+            localStorage.setItem('tt_v7_finances', JSON.stringify(finances));
+            renderFinances();
+        }
+        function renderFinances() {
+            const list = document.getElementById('finList');
+            list.innerHTML = '';
+            finances.forEach(f => {
+                let color = f.type === 'Income' ? 'text-emerald-400' : 'text-rose-400';
+                let sign = f.type === 'Income' ? '+' : '-';
+                list.innerHTML += `
+                    <div class="flex justify-between items-center p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                        <span class="text-sm text-slate-200">${escapeHtml(f.desc)}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold ${color}">${sign} Rs. ${f.amount}</span>
+                            <button onclick="deleteFin(${f.id})" class="text-slate-600 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
-                    <button onclick="deleteTask(${t.id})" class="text-slate-500 hover:text-rose-400 p-2"><i class="fa-solid fa-trash-can text-sm"></i></button>
                 `;
-                container.appendChild(div);
             });
         }
 
-        // --- ATTENDANCE ---
-        document.getElementById('attendanceForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const status = document.querySelector('input[name="attStatus"]:checked').value;
-            const shift = document.getElementById('shiftTiming').value.trim();
-            const remarks = document.getElementById('attRemarks').value.trim();
+        // --- Dashboard Analytics (Chart.js) ---
+        function updateDashboard() {
+            // Stats
+            document.getElementById('dashPendingTasks').textContent = tasks.filter(t => t.status !== 'done').length;
+            document.getElementById('dashTotalClients').textContent = crm.length;
+            
+            let net = 0;
+            finances.forEach(f => net += f.type === 'Income' ? f.amount : -f.amount);
+            document.getElementById('dashNetCash').textContent = `Rs. ${net.toLocaleString()}`;
+            
+            // Charts
+            const ctxTask = document.getElementById('taskChart');
+            const ctxFin = document.getElementById('financeChart');
+            
+            if(charts.task) charts.task.destroy();
+            if(charts.fin) charts.fin.destroy();
 
-            const idx = attendanceLogs.findIndex(l => l.date === todayDateStr);
-            const entry = { date: todayDateStr, status, shift, remarks };
-            if (idx >= 0) attendanceLogs[idx] = entry;
-            else attendanceLogs.unshift(entry);
+            Chart.defaults.color = '#94a3b8';
+            
+            charts.task = new Chart(ctxTask, {
+                type: 'doughnut',
+                data: {
+                    labels: ['To Do', 'In Progress', 'Done'],
+                    datasets: [{
+                        data: [
+                            tasks.filter(t=>t.status==='todo').length, 
+                            tasks.filter(t=>t.status==='progress').length, 
+                            tasks.filter(t=>t.status==='done').length
+                        ],
+                        backgroundColor: ['#334155', '#fbbf24', '#34d399'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+            });
 
-            localStorage.setItem('vexornull_v6_attendance', JSON.stringify(attendanceLogs));
-            renderAttendance();
-            updateAnalytics();
-            showMsg('Saved', 'Attendance logged successfully.', true);
-        });
-        function clearAttendanceHistory() {
-            attendanceLogs = [];
-            localStorage.setItem('vexornull_v6_attendance', JSON.stringify(attendanceLogs));
-            renderAttendance();
-            updateAnalytics();
-        }
-        function renderAttendance() {
-            const container = document.getElementById('attendanceHistoryList');
-            container.innerHTML = '';
-            if (attendanceLogs.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-3">No attendance records.</p>`;
-                return;
-            }
-            attendanceLogs.forEach(l => {
-                const div = document.createElement('div');
-                div.className = 'bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs space-y-1';
-                div.innerHTML = `
-                    <div class="flex justify-between font-semibold text-slate-300">
-                        <span>${escapeHtml(l.date)}</span>
-                        <span class="px-2 py-0.5 rounded border ${l.status === 'Present' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20'}">${l.status}</span>
-                    </div>
-                    ${l.shift ? `<p class="text-slate-400"><i class="fa-regular fa-clock mr-1 text-cyan-400"></i> ${escapeHtml(l.shift)}</p>` : ''}
-                    ${l.remarks ? `<p class="text-slate-400 italic">"${escapeHtml(l.remarks)}"</p>` : ''}
-                `;
-                container.appendChild(div);
+            let incTotal = 0, expTotal = 0;
+            finances.forEach(f => f.type === 'Income' ? incTotal+=f.amount : expTotal+=f.amount);
+
+            charts.fin = new Chart(ctxFin, {
+                type: 'bar',
+                data: {
+                    labels: ['Income', 'Expenses'],
+                    datasets: [{
+                        label: 'Amount (Rs)',
+                        data: [incTotal, expTotal],
+                        backgroundColor: ['#10b981', '#f43f5e'],
+                        borderRadius: 6
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1e293b' } }, x: { grid: { display: false } } } }
             });
         }
 
-        // --- EXPENSES ---
-        document.getElementById('expenseForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const type = document.querySelector('input[name="expType"]:checked').value;
-            const title = document.getElementById('expTitle').value.trim();
-            const amount = parseFloat(document.getElementById('expAmount').value);
-            if (!title || isNaN(amount)) return;
-
-            expenses.unshift({ id: Date.now(), type, title, amount });
-            document.getElementById('expTitle').value = '';
-            document.getElementById('expAmount').value = '';
-            saveExpenses();
-        });
-        function saveExpenses() {
-            localStorage.setItem('vexornull_v6_expenses', JSON.stringify(expenses));
-            renderExpenses();
-            updateAnalytics();
-        }
-        function clearExpenses() {
-            expenses = [];
-            saveExpenses();
-        }
-        function renderExpenses() {
-            const container = document.getElementById('expenseListContainer');
-            container.innerHTML = '';
-            if (expenses.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No transactions recorded.</p>`;
-                return;
-            }
-            expenses.forEach(ex => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs';
-                div.innerHTML = `
-                    <div>
-                        <p class="font-bold text-slate-200">${escapeHtml(ex.title)}</p>
-                        <span class="text-[10px] uppercase font-semibold text-slate-400">${ex.type}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-extrabold text-sm ${ex.type === 'Income' ? 'text-emerald-400' : 'text-rose-400'}">${ex.type === 'Income' ? '+' : '-'}Rs. ${ex.amount.toLocaleString()}</span>
-                        <button onclick="expenses = expenses.filter(x => x.id !== ${ex.id}); saveExpenses();" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
+        function escapeHtml(str) { return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+        
+        // Export logic
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(tasks), "Kanban_Tasks");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(crm), "Clients_CRM");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(finances), "Petty_Cash");
+            XLSX.writeFile(wb, `Tanveer_ERP_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+            alert("Data Exported to Excel!");
         }
 
-        // --- NOTES ---
-        function openNewNoteModal() { document.getElementById('noteModal').classList.remove('hidden'); }
-        function closeNewNoteModal() { document.getElementById('noteModal').classList.add('hidden'); document.getElementById('noteForm').reset(); }
-        document.getElementById('noteForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const title = document.getElementById('noteTitle').value.trim();
-            const category = document.getElementById('noteCategory').value;
-            const content = document.getElementById('noteContent').value.trim();
-            if (!title || !content) return;
-            quickNotes.unshift({ id: Date.now(), title, category, content });
-            localStorage.setItem('vexornull_v6_notes', JSON.stringify(quickNotes));
-            renderNotes();
-            updateAnalytics();
-            closeNewNoteModal();
-        });
-        function renderNotes() {
-            const container = document.getElementById('notesGrid');
-            container.innerHTML = '';
-            if (quickNotes.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 sm:col-span-3">No quick notes saved.</p>`;
-                return;
-            }
-            quickNotes.forEach(n => {
-                const div = document.createElement('div');
-                div.className = 'bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col justify-between';
-                div.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <h4 class="text-xs font-bold text-slate-200 truncate">${escapeHtml(n.title)}</h4>
-                                <span class="text-[10px] text-cyan-400 font-medium">${n.category || 'General'}</span>
-                            </div>
-                            <button onclick="quickNotes = quickNotes.filter(x => x.id !== ${n.id}); localStorage.setItem('vexornull_v6_notes', JSON.stringify(quickNotes)); renderNotes(); updateAnalytics();" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                        <p class="text-xs text-slate-400 whitespace-pre-wrap line-clamp-4 mt-2">${escapeHtml(n.content)}</p>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // --- ANALYTICS ---
-        function updateAnalytics() {
-            const totalTasks = tasks.length;
-            const completedTasks = tasks.filter(t => t.completed).length;
-            const pendingTasks = totalTasks - completedTasks;
-            const taskRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-            document.getElementById('statDashTotalTasks').textContent = totalTasks;
-            document.getElementById('statDashPendingBadge').textContent = `${pendingTasks} pending`;
-            document.getElementById('statDashInvoiceCount').textContent = invoices.length;
-
-            document.getElementById('analyticsTaskPercent').textContent = `${taskRate}%`;
-            document.getElementById('analyticsTaskBar').style.width = `${taskRate}%`;
-
-            const presentCount = attendanceLogs.filter(l => l.status === 'Present').length;
-            const leaveCount = attendanceLogs.filter(l => l.status !== 'Present').length;
-            const attRate = attendanceLogs.length > 0 ? Math.round((presentCount / attendanceLogs.length) * 100) : 0;
-
-            document.getElementById('statDashAttRate').textContent = `${attRate}%`;
-            document.getElementById('analyticsAttPercent').textContent = `${attRate}%`;
-            document.getElementById('analyticsAttBar').style.width = `${attRate}%`;
-            document.getElementById('analyticsPresentCount').textContent = presentCount;
-            document.getElementById('analyticsLeaveCount').textContent = leaveCount;
-
-            let netBal = 0;
-            let totalExp = 0;
-            expenses.forEach(ex => {
-                if (ex.type === 'Income') netBal += ex.amount;
-                else {
-                    netBal -= ex.amount;
-                    totalExp += ex.amount;
-                }
-            });
-            document.getElementById('statDashNetBalance').textContent = `Rs. ${netBal.toLocaleString()}`;
-            document.getElementById('analyticsExpenseTotal').textContent = `Rs. ${totalExp.toLocaleString()}`;
-        }
-
-        function escapeHtml(str) {
-            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        function renderAll() {
-            renderTasks();
-            renderAttendance();
-            renderExpenses();
-            renderInvoices();
-            renderNotes();
-            updateAnalytics();
-        }
-
-        renderAll();
+        // Run setup
+        init();
+        switchTab('dashboard');
     </script>
 </body>
 </html>
