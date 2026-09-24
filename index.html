@@ -180,7 +180,7 @@
                 <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
                     <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Petty Cash Balance</p>
                     <div class="flex items-baseline justify-between mt-2">
-                        <h3 id="statDashNetBalance" class="text-3xl font-extrabold text-cyan-400">$0.00</h3>
+                        <h3 id="statDashNetBalance" class="text-3xl font-extrabold text-cyan-400">Rs. 0</h3>
                         <span class="text-xs text-cyan-500/80">Net Flow</span>
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                         </div>
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
                             <p class="text-xs text-slate-400">Total Expenses Logged</p>
-                            <p id="analyticsExpenseTotal" class="text-2xl font-bold text-rose-400 mt-1">$0.00</p>
+                            <p id="analyticsExpenseTotal" class="text-2xl font-bold text-rose-400 mt-1">Rs. 0</p>
                         </div>
                     </div>
                 </div>
@@ -375,8 +375,8 @@
                             <input type="text" id="expTitle" placeholder="e.g. Fuel, Stationary, Lunch" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
-                            <label for="expAmount" class="block text-xs font-medium text-slate-300 mb-1">Amount ($)</label>
-                            <input type="number" step="0.01" id="expAmount" placeholder="0.00" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <label for="expAmount" class="block text-xs font-medium text-slate-300 mb-1">Amount (Rs.)</label>
+                            <input type="number" step="1" id="expAmount" placeholder="0" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
                         </div>
                         <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition">Record Transaction</button>
                     </form>
@@ -503,8 +503,8 @@
             { id: 1, title: 'Server SSH', content: 'ssh root@192.168.1.50' }
         ];
         let expenses = JSON.parse(localStorage.getItem('vexornull_v4_expenses')) || [
-            { id: 1, type: 'Expense', title: 'Office Stationary', amount: 15.50 },
-            { id: 2, type: 'Income', title: 'Client Advance', amount: 150.00 }
+            { id: 1, type: 'Expense', title: 'Office Stationary', amount: 1500 },
+            { id: 2, type: 'Income', title: 'Client Advance', amount: 15000 }
         ];
         let userPin = localStorage.getItem('vexornull_v4_pin') || '';
         let currentTaskFilter = 'all';
@@ -817,7 +817,7 @@
                         <span class="text-[10px] uppercase font-semibold text-slate-400">${ex.type}</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-extrabold text-sm ${ex.type === 'Income' ? 'text-emerald-400' : 'text-rose-400'}">${ex.type === 'Income' ? '+' : '-'}$${ex.amount.toFixed(2)}</span>
+                        <span class="font-extrabold text-sm ${ex.type === 'Income' ? 'text-emerald-400' : 'text-rose-400'}">${ex.type === 'Income' ? '+' : '-'}Rs. ${ex.amount.toLocaleString()}</span>
                         <button onclick="expenses = expenses.filter(x => x.id !== ${ex.id}); saveExpenses();" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 `;
@@ -895,8 +895,8 @@
                     totalExp += ex.amount;
                 }
             });
-            document.getElementById('statDashNetBalance').textContent = `$${netBal.toFixed(2)}`;
-            document.getElementById('analyticsExpenseTotal').textContent = `$${totalExp.toFixed(2)}`;
+            document.getElementById('statDashNetBalance').textContent = `Rs. ${netBal.toLocaleString()}`;
+            document.getElementById('analyticsExpenseTotal').textContent = `Rs. ${totalExp.toLocaleString()}`;
         }
 
         function escapeHtml(str) {
