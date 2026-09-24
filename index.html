@@ -16,7 +16,7 @@
     <meta name="revisit-after" content="7 days">
     <meta name="theme-color" content="#0ea5e9">
 
-    <!-- Open Graph / Social Media Share Previews (Facebook, WhatsApp, LinkedIn) -->
+    <!-- Open Graph / Social Media Share Previews -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://vexornull.github.io/">
     <meta property="og:title" content="Tanveer Tracker Pro v8.1 | Enterprise ERP Suite">
@@ -99,7 +99,7 @@
                 </div>
                 <div>
                     <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Tanveer Tracker ERP</span>
-                    <span class="hidden sm:inline-block text-[10px] uppercase font-bold text-cyan-300 ml-2 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">v8.0 Ultimate</span>
+                    <span class="hidden sm:inline-block text-[10px] uppercase font-bold text-cyan-300 ml-2 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">v8.1 Ultimate</span>
                 </div>
             </div>
             
@@ -157,7 +157,7 @@
                         </div>
                         <div class="hidden sm:block text-right">
                             <p class="text-xs text-slate-400 font-bold uppercase">Engine Status</p>
-                            <p class="text-emerald-400 text-sm font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> v8.0 Active (@vexornull)</p>
+                            <p class="text-emerald-400 text-sm font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> v8.1 Active (@vexornull)</p>
                         </div>
                     </div>
                     
@@ -173,8 +173,8 @@
                     </div>
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
                         <div class="absolute -right-4 -top-4 text-slate-800/50 text-6xl"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider relative z-10">Revenue Billed</p>
-                        <h3 id="dashTotalRevenue" class="text-2xl font-black text-cyan-400 mt-2 relative z-10">Rs. 0</h3>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider relative z-10">Total Invoices Logged</p>
+                        <h3 id="dashTotalInvoices" class="text-3xl font-black text-cyan-400 mt-2 relative z-10">0</h3>
                     </div>
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
                         <div class="absolute -right-4 -top-4 text-slate-800/50 text-6xl"><i class="fa-solid fa-wallet"></i></div>
@@ -514,6 +514,7 @@
         let finances = JSON.parse(localStorage.getItem('tt_v8_finances')) || [
             { id: 1, desc: 'Opening Balance', amount: 10000, type: 'Income' }
         ];
+        let invoices = JSON.parse(localStorage.getItem('tt_v8_invoices')) || [];
         let currentInvItems = [];
         let charts = {};
 
@@ -559,17 +560,20 @@
             localStorage.setItem('tt_v8_tasks', JSON.stringify(tasks));
             closeTaskModal();
             renderKanban();
+            updateDashboard();
         }
 
         function deleteTask(id) {
             tasks = tasks.filter(t => t.id !== id);
             localStorage.setItem('tt_v8_tasks', JSON.stringify(tasks));
             renderKanban();
+            updateDashboard();
         }
 
         function renderKanban() {
             ['todo', 'progress', 'done'].forEach(status => {
                 const col = document.getElementById(`col-${status}`);
+                if (!col) return;
                 col.innerHTML = '';
                 let count = 0;
                 
@@ -592,7 +596,8 @@
                     `;
                     col.appendChild(card);
                 });
-                document.getElementById(`count${status.charAt(0).toUpperCase() + status.slice(1)}`).textContent = count;
+                let countEl = document.getElementById(`count${status === 'progress' ? 'Prog' : status.charAt(0).toUpperCase() + status.slice(1)}`);
+                if(countEl) countEl.textContent = count;
             });
         }
 
@@ -608,6 +613,7 @@
                 task.status = status;
                 localStorage.setItem('tt_v8_tasks', JSON.stringify(tasks));
                 renderKanban();
+                updateDashboard();
             }
         }
 
@@ -623,17 +629,20 @@
             localStorage.setItem('tt_v8_crm', JSON.stringify(crm));
             e.target.reset();
             renderCRM();
+            updateDashboard();
         });
 
         function deleteCrm(id) {
             crm = crm.filter(c => c.id !== id);
             localStorage.setItem('tt_v8_crm', JSON.stringify(crm));
             renderCRM();
+            updateDashboard();
         }
 
         function renderCRM() {
             const list = document.getElementById('crmList');
             const select = document.getElementById('invClientSelect');
+            if(!list || !select) return;
             list.innerHTML = '';
             select.innerHTML = '<option value="">-- Choose from CRM --</option>';
             
@@ -669,11 +678,11 @@
 
         function addInvItem() {
             let desc = document.getElementById('invItem').value;
-            let qty = document.getElementById('invQty').value || 1;
-            let rate = document.getElementById('invRate').value;
+            let qty = parseFloat(document.getElementById('invQty').value) || 1;
+            let rate = parseFloat(document.getElementById('invRate').value) || 0;
             if(!desc || !rate) return;
             
-            currentInvItems.push({ id: Date.now(), desc, qty, rate, amt: qty*rate });
+            currentInvItems.push({ id: Date.now(), desc, qty, rate, amt: qty * rate });
             document.getElementById('invItem').value = '';
             renderInvoiceItems();
         }
@@ -686,6 +695,7 @@
         function renderInvoiceItems() {
             const list = document.getElementById('invPreviewList');
             const table = document.getElementById('dispInvTable');
+            if(!list || !table) return;
             list.innerHTML = ''; table.innerHTML = '';
             let total = 0;
 
@@ -700,7 +710,7 @@
                 list.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-2 rounded text-xs border border-slate-800">
                     <span class="text-slate-300 truncate">${escapeHtml(i.desc)}</span>
                     <div class="flex items-center gap-2 text-cyan-400 font-bold">
-                        <span>Rs. ${i.amt}</span>
+                        <span>Rs. ${i.amt.toLocaleString()}</span>
                         <button onclick="delInvItem(${i.id})" class="text-slate-600 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </div>`;
@@ -708,16 +718,32 @@
                 table.innerHTML += `<tr>
                     <td class="p-3 font-medium text-slate-800 border-b border-slate-100">${escapeHtml(i.desc)}</td>
                     <td class="p-3 text-center text-slate-600 border-b border-slate-100">${i.qty}</td>
-                    <td class="p-3 text-right text-slate-600 border-b border-slate-100">Rs. ${i.rate}</td>
-                    <td class="p-3 text-right font-bold text-slate-800 border-b border-slate-100">Rs. ${i.amt}</td>
+                    <td class="p-3 text-right text-slate-600 border-b border-slate-100">Rs. ${i.rate.toLocaleString()}</td>
+                    <td class="p-3 text-right font-bold text-slate-800 border-b border-slate-100">Rs. ${i.amt.toLocaleString()}</td>
                 </tr>`;
             });
             document.getElementById('dispInvTotal').textContent = `Rs. ${total.toLocaleString()}`;
         }
 
         function printSmartInvoice() {
+            if(currentInvItems.length === 0) {
+                alert("Please add at least one item to the invoice before printing.");
+                return;
+            }
+            // Save invoice log
+            invoices.push({
+                id: Date.now(),
+                invoiceNumber: document.getElementById('invNum').value,
+                client: document.getElementById('dispClientName').textContent,
+                date: new Date().toLocaleDateString(),
+                itemsCount: currentInvItems.length,
+                totalAmount: currentInvItems.reduce((acc, item) => acc + item.amt, 0)
+            });
+            localStorage.setItem('tt_v8_invoices', JSON.stringify(invoices));
+            updateDashboard();
+            
             switchTab('invoice');
-            window.print();
+            setTimeout(() => window.print(), 300);
         }
 
         // Attendance Logic
@@ -745,6 +771,7 @@
 
         function renderAttendance() {
             const body = document.getElementById('attendanceTableBody');
+            if(!body) return;
             body.innerHTML = '';
             document.getElementById('attCount').textContent = `${attendance.length} Records`;
 
@@ -806,16 +833,19 @@
             localStorage.setItem('tt_v8_finances', JSON.stringify(finances));
             e.target.reset();
             renderFinances();
+            updateDashboard();
         }
 
         function deleteFin(id) {
             finances = finances.filter(f => f.id !== id);
             localStorage.setItem('tt_v8_finances', JSON.stringify(finances));
             renderFinances();
+            updateDashboard();
         }
 
         function renderFinances() {
             const list = document.getElementById('finList');
+            if(!list) return;
             list.innerHTML = '';
             finances.forEach(f => {
                 let color = f.type === 'Income' ? 'text-emerald-400' : 'text-rose-400';
@@ -834,12 +864,19 @@
 
         // Dashboard & Analytics
         function updateDashboard() {
-            document.getElementById('dashPendingTasks').textContent = tasks.filter(t => t.status !== 'done').length;
-            document.getElementById('dashTotalClients').textContent = crm.length;
+            let pendingCount = tasks.filter(t => t.status !== 'done').length;
+            let pendingTaskEl = document.getElementById('dashPendingTasks');
+            let totalClientsEl = document.getElementById('dashTotalClients');
+            let totalInvoicesEl = document.getElementById('dashTotalInvoices');
+            let dashNetCashEl = document.getElementById('dashNetCash');
+
+            if(pendingTaskEl) pendingTaskEl.textContent = pendingCount;
+            if(totalClientsEl) totalClientsEl.textContent = crm.length;
+            if(totalInvoicesEl) totalInvoicesEl.textContent = invoices.length;
             
             let net = 0;
             finances.forEach(f => net += f.type === 'Income' ? f.amount : -f.amount);
-            document.getElementById('dashNetCash').textContent = `Rs. ${net.toLocaleString()}`;
+            if(dashNetCashEl) dashNetCashEl.textContent = `Rs. ${net.toLocaleString()}`;
             
             const ctxTask = document.getElementById('taskChart');
             const ctxFin = document.getElementById('financeChart');
@@ -849,39 +886,43 @@
 
             Chart.defaults.color = '#94a3b8';
             
-            charts.task = new Chart(ctxTask, {
-                type: 'doughnut',
-                data: {
-                    labels: ['To Do', 'In Progress', 'Done'],
-                    datasets: [{
-                        data: [
-                            tasks.filter(t=>t.status==='todo').length, 
-                            tasks.filter(t=>t.status==='progress').length, 
-                            tasks.filter(t=>t.status==='done').length
-                        ],
-                        backgroundColor: ['#334155', '#fbbf24', '#34d399'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
-            });
+            if(ctxTask) {
+                charts.task = new Chart(ctxTask, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['To Do', 'In Progress', 'Done'],
+                        datasets: [{
+                            data: [
+                                tasks.filter(t=>t.status==='todo').length, 
+                                tasks.filter(t=>t.status==='progress').length, 
+                                tasks.filter(t=>t.status==='done').length
+                            ],
+                            backgroundColor: ['#334155', '#fbbf24', '#34d399'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+                });
+            }
 
             let incTotal = 0, expTotal = 0;
-            finances.forEach(f => f.type === 'Income' ? incTotal+=f.amount : expTotal+=f.amount);
+            finances.forEach(f => f.type === 'Income' ? incTotal += f.amount : expTotal += f.amount);
 
-            charts.fin = new Chart(ctxFin, {
-                type: 'bar',
-                data: {
-                    labels: ['Income', 'Expenses'],
-                    datasets: [{
-                        label: 'Amount (Rs)',
-                        data: [incTotal, expTotal],
-                        backgroundColor: ['#10b981', '#f43f5e'],
-                        borderRadius: 6
-                    }]
-                },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1e293b' } }, x: { grid: { display: false } } } }
-            });
+            if(ctxFin) {
+                charts.fin = new Chart(ctxFin, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Income', 'Expenses'],
+                        datasets: [{
+                            label: 'Amount (Rs)',
+                            data: [incTotal, expTotal],
+                            backgroundColor: ['#10b981', '#f43f5e'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1e293b' } }, x: { grid: { display: false } } } }
+                });
+            }
         }
 
         function escapeHtml(str) { return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -892,12 +933,13 @@
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(crm), "Clients_CRM");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(attendance), "Attendance");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(finances), "Petty_Cash");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invoices), "Invoices");
             XLSX.writeFile(wb, `Tanveer_ERP_v8_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
             alert("Data Exported to Excel Successfully!");
         }
 
         function triggerBackup() {
-            const backupData = { tasks, crm, attendance, finances, version: "8.0", date: new Date().toISOString() };
+            const backupData = { tasks, crm, attendance, finances, invoices, version: "8.1", date: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
